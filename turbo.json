@@ -1,17 +1,41 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
+  "ui": "stream",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"]
+      "env": [
+        "NEXT_PUBLIC_*",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "MUX_TOKEN_ID",
+        "MUX_TOKEN_SECRET",
+        "MUX_WEBHOOK_SECRET",
+        "EXTENSION_ID",
+        "UPSTASH_REDIS_REST_URL",
+        "UPSTASH_REDIS_REST_TOKEN",
+        "WXT_*"
+      ],
+      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**", ".output/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "test": {
+      "outputs": []
+    },
+    "test:e2e": {
+      "cache": false,
+      "env": [
+        "NEXT_PUBLIC_*",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "NEXT_DIST_DIR",
+        "MOCK_SUPABASE_PORT",
+        "CI"
+      ]
     },
     "dev": {
       "cache": false,

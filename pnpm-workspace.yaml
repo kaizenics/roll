@@ -1,3 +1,18 @@
 packages:
   - "apps/*"
   - "packages/*"
+  # Leftovers from the create-turbo starter; not part of Roll.
+  - "!apps/docs"
+  - "!packages/ui"
+minimumReleaseAgeExclude:
+  - zod@4.6.6
+# The web app uses React 19 types and the extension React 18 types. These
+# libraries import "react" types without declaring @types/react as a peer, so
+# pnpm would otherwise hand them whichever version got hoisted.
+packageExtensions:
+  next-themes:
+    peerDependencies:
+      "@types/react": "*"
+  sonner:
+    peerDependencies:
+      "@types/react": "*"

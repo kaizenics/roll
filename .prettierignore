@@ -1,0 +1,12 @@
+pnpm-lock.yaml
+.next
+.next-e2e
+.output
+.wxt
+.turbo
+node_modules
+coverage
+playwright-report
+test-results
+apps/docs
+packages/ui
