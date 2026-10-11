@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Roll — allow microphone & camera</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: Canvas;
+        color: CanvasText;
+      }
+      main {
+        max-width: 420px;
+        padding: 32px;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 8px;
+      }
+      p {
+        opacity: 0.75;
+        line-height: 1.5;
+      }
+      button {
+        margin-top: 16px;
+        padding: 10px 20px;
+        border: 0;
+        border-radius: 8px;
+        background: #6d5dfc;
+        color: #fff;
+        font-size: 15px;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid #a5b4fc;
+        outline-offset: 2px;
+      }
+      [hidden] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="title">Allow access</h1>
+      <p id="message">Roll needs permission to use your microphone and camera while recording.</p>
+      <button id="request" type="button">Allow access</button>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

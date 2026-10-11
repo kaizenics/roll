@@ -1,4 +1,13 @@
 import { nextJsConfig } from "@repo/eslint-config/next-js";
 
-/** @type {import("eslint").Linter.Config[]} */
-export default nextJsConfig;
+export default [
+  ...nextJsConfig,
+  {
+    ignores: [
+      ".next-e2e/**",
+      "playwright-report/**",
+      "test-results/**",
+      "lib/supabase/database.types.ts",
+    ],
+  },
+];
