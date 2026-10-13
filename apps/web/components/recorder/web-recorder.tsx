@@ -7,11 +7,11 @@ import {
   RECORDING_WARNING_MS,
   type CreateVideoResponse,
 } from "@roll/shared";
-import { Loader2, Pause, Play, Square, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Link2, Loader2, Pause, Play, Square, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { DeviceSelect, ToggleRow } from "@/components/recorder/fields";
 import { createVideo } from "@/lib/api-client";
 import {
@@ -25,7 +25,7 @@ import {
 } from "@/lib/recorder/media";
 import { uploadToMux } from "@/lib/recorder/upload";
 
-type Phase = "setup" | "countdown" | "recording" | "paused" | "uploading" | "failed";
+type Phase = "setup" | "countdown" | "recording" | "paused" | "uploading" | "uploaded" | "failed";
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
@@ -33,7 +33,6 @@ function message(error: unknown): string {
 
 /** Records the screen in the browser (no extension) and uploads straight to Mux. */
 export function WebRecorder() {
-  const router = useRouter();
   const [supported, setSupported] = useState(true);
   const [phase, setPhase] = useState<Phase>("setup");
   const [mic, setMic] = useState(true);
@@ -45,6 +44,7 @@ export function WebRecorder() {
   const [elapsedMs, setElapsedMs] = useState(0);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const previewRef = useRef<HTMLVideoElement>(null);
   const cameraStream = useRef<MediaStream | null>(null);
@@ -106,18 +106,34 @@ export function WebRecorder() {
     setError(null);
     try {
       target.current ??= await createVideo();
-      const { shareUrl, uploadUrl, shortId } = target.current;
-      await navigator.clipboard.writeText(shareUrl).then(
-        () => toast.success("Share link copied"),
-        () => undefined, // Clipboard needs page focus; the link is shown on the next page anyway.
-      );
-      await uploadToMux(file, uploadUrl, setProgress);
-      router.push(`/v/${shortId}`);
+      await uploadToMux(file, target.current.uploadUrl, setProgress);
+      blob.current = null;
+      setShareUrl(null);
+      setPhase("uploaded");
     } catch (err) {
       setError(message(err));
       setPhase("failed");
     }
-  }, [router]);
+  }, []);
+
+  // The link is only revealed and copied when the user asks for it.
+  async function generateLink() {
+    const url = target.current?.shareUrl;
+    if (!url) return;
+    setShareUrl(url);
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard");
+    } catch {
+      toast.info("Copy the link below to share it.");
+    }
+  }
+
+  function recordAnother() {
+    target.current = null;
+    setShareUrl(null);
+    setPhase("setup");
+  }
 
   const stop = useCallback(async () => {
     const current = session.current;
@@ -326,6 +342,42 @@ export function WebRecorder() {
               />
             </div>
             <p className="text-muted-foreground text-sm">Keep this tab open until it finishes.</p>
+          </div>
+        ) : phase === "uploaded" ? (
+          <div className="flex flex-col gap-3">
+            <p role="status" className="font-medium">
+              Upload complete. Your video is processing.
+            </p>
+            {shareUrl ? (
+              <>
+                <label htmlFor="share-url" className="sr-only">
+                  Shareable link
+                </label>
+                <Input
+                  id="share-url"
+                  readOnly
+                  value={shareUrl}
+                  onFocus={(event) => event.currentTarget.select()}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" onClick={() => void generateLink()}>
+                    <Link2 aria-hidden />
+                    Copy again
+                  </Button>
+                  <Button asChild>
+                    <a href={shareUrl}>Open video</a>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Button size="lg" onClick={() => void generateLink()}>
+                <Link2 aria-hidden />
+                Generate Shareable Link
+              </Button>
+            )}
+            <Button variant="ghost" onClick={recordAnother}>
+              Record another
+            </Button>
           </div>
         ) : (
           busy && (
