@@ -18,7 +18,7 @@ export default async function LoginPage({
       <Logo />
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Sign in to Roll</CardTitle>
+          <CardTitle className="font-serif text-3xl font-normal">Sign in to Roll</CardTitle>
           <CardDescription>Use a magic link or your Google account.</CardDescription>
         </CardHeader>
         <CardContent>

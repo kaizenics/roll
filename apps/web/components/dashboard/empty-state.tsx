@@ -13,7 +13,7 @@ export function EmptyState() {
         <li>Install the Roll Chrome extension and pin it to your toolbar.</li>
         <li>Click the Roll icon and sign in.</li>
         <li>Pick screen, window or tab, then hit “Start recording”.</li>
-        <li>Press stop — your share link is copied automatically and shows up here.</li>
+        <li>Press stop. Your share link is copied automatically and shows up here.</li>
       </ol>
       <Button asChild>
         <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">

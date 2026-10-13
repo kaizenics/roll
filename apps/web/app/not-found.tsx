@@ -8,7 +8,7 @@ export default function NotFound() {
       className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center"
     >
       <p className="text-primary text-sm font-medium">404</p>
-      <h1 className="text-3xl font-semibold tracking-tight">Page not found</h1>
+      <h1 className="font-serif text-5xl tracking-[-0.02em]">Page not found</h1>
       <Button asChild>
         <Link href="/">Go home</Link>
       </Button>

@@ -10,7 +10,7 @@ export function Logo() {
         aria-hidden
         className="bg-primary text-primary-foreground flex size-7 items-center justify-center rounded-full"
       >
-        <span className="bg-primary-foreground size-2.5 rounded-full" />
+        <span className="bg-record size-2.5 rounded-full" />
       </span>
       Roll
     </Link>
