@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const next = resolvedTheme === "dark" ? "light" : "dark";
 
+  // The label must not depend on the theme: the server can't know it, so a
+  // theme-specific label causes a hydration mismatch. CSS swaps the icon.
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label={`Switch to ${next} theme`}
-      onClick={() => setTheme(next)}
+      aria-label="Toggle theme"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
     >
       <Sun className="hidden dark:block" aria-hidden />
       <Moon className="block dark:hidden" aria-hidden />

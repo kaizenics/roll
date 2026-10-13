@@ -126,10 +126,12 @@
     animation: reveal 600ms var(--ease-out-soft) both;
     animation-delay: calc(var(--i, 0) * 80ms);
   }
+  /* Content comes into focus: faded, lowered and blurred to sharp. */
   @keyframes reveal {
     from {
       opacity: 0;
-      transform: translateY(12px);
+      transform: translateY(14px);
+      filter: blur(10px);
     }
   }
 }
@@ -137,4 +139,96 @@
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Scroll-in reveal driven by CSS scroll timelines (no JS, nothing can stay hidden). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scroll-reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+/* ── iOS-style glass ───────────────────────────────────────────────────────
+   Header: frosted glass. With scroll timelines it starts clear at the top of
+   the page and frosts over the first 80px of scrolling. */
+.site-header {
+  background-color: color-mix(in oklab, var(--background) 72%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: header-glass linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 80px;
+  }
+  /* Animated on the blur layers, not the wrapper: an ancestor with animated
+     opacity becomes a backdrop root and its children would blur nothing. */
+  .edge-blur-top > div {
+    animation: fade-in linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 80px;
+  }
+  /* The bottom edge fades out as the page ends, so it never covers the footer. */
+  .edge-blur-bottom > div {
+    animation: fade-out linear both;
+    animation-timeline: scroll(root);
+    animation-range: calc(100% - 160px) 100%;
+  }
+}
+
+@keyframes header-glass {
+  from {
+    background-color: transparent;
+    backdrop-filter: saturate(100%) blur(0);
+    border-bottom-color: transparent;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Progressive blur: stacked backdrop blurs, each masked to its own band, so the
+   blur ramps up smoothly toward the edge instead of stopping at a hard line. */
+/* Positioning comes from utilities (e.g. fixed); unlayered CSS here would override them. */
+.edge-blur {
+  pointer-events: none;
+}
+.edge-blur > div {
+  position: absolute;
+  inset: 0;
+}
+.edge-blur > div:nth-child(1) {
+  backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to var(--edge), transparent 0%, #000 25%, #000 50%, transparent 75%);
+}
+.edge-blur > div:nth-child(2) {
+  backdrop-filter: blur(3px);
+  mask-image: linear-gradient(
+    to var(--edge),
+    transparent 25%,
+    #000 50%,
+    #000 75%,
+    transparent 100%
+  );
+}
+.edge-blur > div:nth-child(3) {
+  backdrop-filter: blur(8px);
+  mask-image: linear-gradient(to var(--edge), transparent 50%, #000 75%);
+}
+.edge-blur > div:nth-child(4) {
+  backdrop-filter: blur(16px);
+  mask-image: linear-gradient(to var(--edge), transparent 75%, #000 100%);
 }

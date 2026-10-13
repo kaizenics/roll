@@ -4,7 +4,7 @@ export default [
   ...nextJsConfig,
   {
     ignores: [
-      ".next-e2e/**",
+      ".next-*/**",
       "playwright-report/**",
       "test-results/**",
       "lib/supabase/database.types.ts",
