@@ -13,12 +13,27 @@ export function Header({
   const label = user?.name ?? user?.email ?? "";
   return (
     <header className="flex items-center gap-3 border-b border-stone-200 px-4 py-3 dark:border-stone-800">
-      <span
-        aria-hidden
-        className="flex size-7 items-center justify-center rounded-full bg-stone-900 dark:bg-stone-100"
-      >
-        <span className="bg-record size-2.5 rounded-full" />
-      </span>
+      {/* Same mark as the web app's LogoMark. */}
+      <svg viewBox="0 0 32 32" aria-hidden className="size-7">
+        <rect
+          x="3"
+          y="6"
+          width="21"
+          height="16"
+          rx="4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+        />
+        <circle
+          cx="23"
+          cy="21"
+          r="6"
+          className="fill-record stroke-stone-50 dark:stroke-stone-950"
+          strokeWidth="3"
+          paintOrder="stroke"
+        />
+      </svg>
       <span className="font-semibold">Roll</span>
       {user && (
         <div className="ml-auto flex min-w-0 items-center gap-2">
