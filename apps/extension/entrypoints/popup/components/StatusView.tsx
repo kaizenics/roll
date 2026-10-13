@@ -16,7 +16,7 @@ function ShareLink({ url }: { url: string }) {
         readOnly
         value={url}
         aria-label="Share link"
-        className="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-transparent px-2 py-1.5 text-sm dark:border-zinc-700"
+        className="min-w-0 flex-1 rounded-lg border border-stone-300 bg-transparent px-2 py-1.5 text-sm dark:border-stone-700"
         onFocus={(event) => event.currentTarget.select()}
       />
       <Button
@@ -70,11 +70,11 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
             <span className="text-3xl font-semibold tabular-nums">
               {formatDuration(state.elapsedMs)}
             </span>
-            <span className="text-sm text-zinc-500">{paused ? "Paused" : "Recording"}</span>
+            <span className="text-sm text-stone-500">{paused ? "Paused" : "Recording"}</span>
           </div>
           {state.warned && (
             <Alert tone="info">
-              {formatDuration(MAX_RECORDING_MS - state.elapsedMs)} left — recordings stop at 30:00.
+              {formatDuration(MAX_RECORDING_MS - state.elapsedMs)} left. Recordings stop at 30:00.
             </Alert>
           )}
           <div className="grid grid-cols-2 gap-2">
@@ -109,7 +109,7 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
         <section className="flex flex-col gap-3 p-4">
           <p className="text-sm font-medium">Uploading… {state.progress}%</p>
           <div
-            className="h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"
+            className="h-2 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800"
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={100}
@@ -121,7 +121,7 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
               style={{ width: `${state.progress}%` }}
             />
           </div>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-stone-500">
             The link is already on your clipboard. Keep Chrome open until the upload finishes.
           </p>
           <ShareLink url={state.shareUrl} />
@@ -131,7 +131,7 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
     case "done":
       return (
         <section className="flex flex-col gap-3 p-4">
-          <p className="text-sm font-medium">Uploaded ✓ — your video is processing.</p>
+          <p className="text-sm font-medium">Uploaded. Your video is processing.</p>
           <ShareLink url={state.shareUrl} />
           <div className="grid grid-cols-2 gap-2">
             <Button

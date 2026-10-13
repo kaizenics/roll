@@ -21,13 +21,13 @@ const CSS = `${BASE_CSS}
   .circle:active { cursor: grabbing; }
   iframe { width: 100%; height: 100%; border: 0; pointer-events: none; display: block; }
   .bar { position: absolute; left: 50%; top: -14px; transform: translate(-50%, -100%); display: flex; gap: 4px;
-    padding: 4px; border-radius: 999px; background: #16161d; opacity: 0; transition: opacity .15s; }
+    padding: 4px; border-radius: 999px; background: #1f1e1c; opacity: 0; transition: opacity .15s; }
   .wrap:hover .bar, .wrap:focus-within .bar { opacity: 1; }
   .bar button { height: 26px; min-width: 26px; padding: 0 8px; border-radius: 999px; background: transparent;
     color: #fff; font-size: 12px; font-weight: 600; }
   .bar button[aria-pressed="true"] { background: rgba(255,255,255,.2); }
   .bar button:hover { background: rgba(255,255,255,.25); }
-  .show { pointer-events: auto; position: fixed; padding: 8px 12px; border-radius: 999px; background: #16161d;
+  .show { pointer-events: auto; position: fixed; padding: 8px 12px; border-radius: 999px; background: #1f1e1c;
     color: #fff; font-size: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
 `;
 

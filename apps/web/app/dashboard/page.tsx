@@ -25,7 +25,7 @@ export default async function DashboardPage() {
     <>
       <SiteHeader />
       <main id="main" className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="mb-6 text-2xl font-semibold tracking-tight">Your videos</h1>
+        <h1 className="mb-8 font-serif text-4xl tracking-[-0.01em]">Your videos</h1>
         <VideoGrid initialVideos={videos} />
       </main>
     </>

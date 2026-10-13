@@ -33,5 +33,5 @@ export const BASE_CSS = `
   :host { all: initial; }
   * { box-sizing: border-box; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   button { font: inherit; cursor: pointer; border: 0; }
-  button:focus-visible { outline: 3px solid #a5b4fc; outline-offset: 2px; }
+  button:focus-visible { outline: 3px solid #a8a29e; outline-offset: 2px; }
 `;

@@ -18,7 +18,7 @@ const CSS = `${BASE_CSS}
   .pill {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); pointer-events: auto;
     display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 999px;
-    background: #16161d; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size: 14px;
+    background: #1f1e1c; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size: 14px;
   }
   .pill.warn { background: #92400e; }
   .time { display: flex; align-items: center; gap: 8px; padding: 0 10px 0 8px; font-variant-numeric: tabular-nums; min-width: 92px; }

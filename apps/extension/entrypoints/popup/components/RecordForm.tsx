@@ -49,7 +49,7 @@ function DeviceSelect({
         value={value ?? ""}
         disabled={disabled}
         onChange={(event) => onChange(event.target.value || null)}
-        className="w-full rounded-lg border border-zinc-300 bg-transparent px-2 py-1.5 text-sm disabled:opacity-50 dark:border-zinc-700"
+        className="w-full rounded-lg border border-stone-300 bg-transparent px-2 py-1.5 text-sm disabled:opacity-50 dark:border-stone-700"
       >
         <option value="">System default</option>
         {devices.map((device, index) => (
@@ -116,7 +116,7 @@ export function RecordForm() {
       <fieldset>
         <legend className="mb-2 text-sm font-medium">Record</legend>
         <div
-          className="grid grid-cols-3 gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-800"
+          className="grid grid-cols-3 gap-1 rounded-lg bg-stone-100 p-1 dark:bg-stone-800"
           role="radiogroup"
         >
           {SOURCES.map((source) => (
@@ -128,8 +128,8 @@ export function RecordForm() {
               onClick={() => update({ source: source.value })}
               className={`rounded-md px-2 py-1.5 text-sm transition-colors ${
                 prefs.source === source.value
-                  ? "bg-white font-medium shadow-sm dark:bg-zinc-700"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  ? "bg-white font-medium shadow-sm dark:bg-stone-700"
+                  : "text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
               }`}
             >
               {source.label}
@@ -186,7 +186,7 @@ export function RecordForm() {
       {error && <Alert>{error}</Alert>}
 
       <Button className="h-11 text-base" onClick={() => void start()} disabled={starting}>
-        <span aria-hidden className="size-3 rounded-full bg-red-500 ring-2 ring-white/70" />
+        <span aria-hidden className="bg-record size-3 rounded-full" />
         {missingMic || missingCamera ? "Allow access" : starting ? "Starting…" : "Start recording"}
       </Button>
     </section>

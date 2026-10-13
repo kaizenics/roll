@@ -9,20 +9,20 @@ export function FailedUploads({ items }: { items: FailedRecording[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-2 border-t border-zinc-200 p-4 dark:border-zinc-800">
+    <section className="flex flex-col gap-2 border-t border-stone-200 p-4 dark:border-stone-800">
       <h2 className="text-sm font-medium">Recordings waiting to upload</h2>
       {error && <Alert>{error}</Alert>}
       <ul className="flex flex-col gap-2">
         {items.map((item) => (
           <li
             key={item.recordingId}
-            className="flex items-center gap-2 rounded-lg bg-zinc-50 p-2 text-sm dark:bg-zinc-800/60"
+            className="flex items-center gap-2 rounded-lg bg-stone-50 p-2 text-sm dark:bg-stone-800/60"
           >
             <div className="min-w-0 flex-1">
               <p className="font-medium">
                 {new Date(item.createdAt).toLocaleString()} · {formatDuration(item.durationMs)}
               </p>
-              <p className="truncate text-xs text-zinc-500" title={item.error}>
+              <p className="truncate text-xs text-stone-500" title={item.error}>
                 {item.error}
               </p>
             </div>

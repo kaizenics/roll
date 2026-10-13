@@ -90,7 +90,7 @@ export default async function ViewerPage({ params }: Props) {
     <>
       <SiteHeader />
       <main id="main" className="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6">
-        <div className="overflow-hidden rounded-xl bg-black shadow-lg">
+        <div className="overflow-hidden rounded-xl bg-[#161513]">
           {video.status === "ready" && video.playbackId ? (
             <VideoPlayer playbackId={video.playbackId} title={video.title} videoId={video.id} />
           ) : video.status === "errored" ? (
@@ -122,7 +122,7 @@ export default async function ViewerPage({ params }: Props) {
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-3">
-            <h1 className="break-words text-2xl font-semibold tracking-tight">{video.title}</h1>
+            <h1 className="break-words font-serif text-4xl tracking-[-0.01em]">{video.title}</h1>
             <div className="flex items-center gap-3">
               <Avatar>
                 {video.owner.avatarUrl && <AvatarImage src={video.owner.avatarUrl} alt="" />}

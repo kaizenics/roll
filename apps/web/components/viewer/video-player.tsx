@@ -15,7 +15,7 @@ export function VideoPlayer({
     <MuxPlayer
       playbackId={playbackId}
       streamType="on-demand"
-      accentColor="#6d5dfc"
+      accentColor="#e5484d"
       metadata={{ video_id: videoId, video_title: title }}
       title={title}
       className="aspect-video w-full"
