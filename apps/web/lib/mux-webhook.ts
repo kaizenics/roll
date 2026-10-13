@@ -136,6 +136,14 @@ export function computeVideoUpdate(current: VideoState, event: MuxEvent): VideoU
       };
     }
     case "video.asset.errored":
+      // A failed trim: the original asset is still playable, so go back to it.
+      if (
+        current.mux_playback_id &&
+        current.mux_asset_id &&
+        current.mux_asset_id !== event.data.id
+      ) {
+        return current.status === "ready" ? null : { status: "ready" };
+      }
       if (current.status === "ready" || current.status === "errored") return null;
       return { status: "errored", mux_asset_id: event.data.id };
   }
@@ -197,9 +205,27 @@ export async function handleMuxWebhook(input: {
     return { status: 200, body: { ignored: "unknown video" } };
   }
 
+  const updated = await applyMuxEvent(repo, video, event);
+  return { status: 200, body: updated ? { updated: true } : { unchanged: true } };
+}
+
+/**
+ * Applies one Mux event to a video. Shared by the webhook and by the status
+ * sync that asks Mux directly. Returns whether anything changed.
+ */
+export async function applyMuxEvent(
+  repo: WebhookRepo,
+  video: { id: string } & VideoState,
+  event: MuxEvent,
+): Promise<boolean> {
   const patch = computeVideoUpdate(video, event);
-  if (!patch) return { status: 200, body: { unchanged: true } };
+  if (!patch) return false;
 
   await repo.updateVideo(video.id, patch);
-  return { status: 200, body: { updated: true } };
+  // A trimmed copy replaced the original asset: delete the original.
+  const replaced = video.mux_asset_id;
+  if (event.type === "video.asset.ready" && replaced && replaced !== event.data.id) {
+    await repo.deleteOrphanAsset(replaced);
+  }
+  return true;
 }

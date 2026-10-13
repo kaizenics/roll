@@ -1,5 +1,4 @@
 import { formatDuration, MAX_RECORDING_MS } from "@roll/shared";
-import { useState } from "react";
 import { browser } from "wxt/browser";
 import { sendToBackground } from "@/lib/messaging";
 import type { RecorderState } from "@/lib/recorder-machine";
@@ -7,30 +6,6 @@ import { Alert, Button } from "./ui";
 
 const send = (type: "PAUSE" | "RESUME" | "STOP" | "DISCARD" | "RESET") =>
   void sendToBackground({ target: "background", type });
-
-function ShareLink({ url }: { url: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <div className="flex items-center gap-2">
-      <input
-        readOnly
-        value={url}
-        aria-label="Share link"
-        className="min-w-0 flex-1 rounded-lg border border-stone-300 bg-transparent px-2 py-1.5 text-sm dark:border-stone-700"
-        onFocus={(event) => event.currentTarget.select()}
-      />
-      <Button
-        variant="secondary"
-        onClick={async () => {
-          await navigator.clipboard.writeText(url);
-          setCopied(true);
-        }}
-      >
-        {copied ? "Copied" : "Copy"}
-      </Button>
-    </div>
-  );
-}
 
 /** Popup view for every non-idle recorder state. */
 export function StatusView({ state }: { state: Exclude<RecorderState, { status: "idle" }> }) {
@@ -122,9 +97,8 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
             />
           </div>
           <p className="text-xs text-stone-500">
-            The link is already on your clipboard. Keep Chrome open until the upload finishes.
+            Keep Chrome open until the upload finishes. Share the video from its page.
           </p>
-          <ShareLink url={state.shareUrl} />
         </section>
       );
 
@@ -132,7 +106,9 @@ export function StatusView({ state }: { state: Exclude<RecorderState, { status: 
       return (
         <section className="flex flex-col gap-3 p-4">
           <p className="text-sm font-medium">Uploaded. Your video is processing.</p>
-          <ShareLink url={state.shareUrl} />
+          <p className="text-xs text-stone-500">
+            Open the video and choose “Generate shareable link” to share it.
+          </p>
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant="secondary"

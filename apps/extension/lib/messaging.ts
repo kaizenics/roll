@@ -65,8 +65,7 @@ export type OffscreenRequest =
   | { target: "offscreen"; type: "RESUME" }
   | { target: "offscreen"; type: "STOP" }
   | { target: "offscreen"; type: "DISCARD" }
-  | { target: "offscreen"; type: "UPLOAD"; recordingId: string; uploadUrl: string }
-  | { target: "offscreen"; type: "COPY"; text: string };
+  | { target: "offscreen"; type: "UPLOAD"; recordingId: string; uploadUrl: string };
 
 export type OffscreenResponse =
   | { ok: true; recording?: { recordingId: string; durationMs: number; size: number } }

@@ -1,7 +1,7 @@
 import { AlertTriangle, Eye, Loader2 } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { buildShareUrl, muxMp4Url, muxPosterJpgUrl } from "@roll/shared";
+import { buildShareUrl, muxDownloadUrl, muxMp4Url, muxPosterJpgUrl } from "@roll/shared";
 import { SiteHeader } from "@/components/site-header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CopyLinkButton } from "@/components/video/copy-link-button";
@@ -10,9 +10,11 @@ import { ProcessingRefresher } from "@/components/viewer/processing-refresher";
 import { VideoPlayer } from "@/components/viewer/video-player";
 import { ViewTracker } from "@/components/viewer/view-tracker";
 import { getAppUrl } from "@/lib/env";
+import { syncVideoByShortId } from "@/lib/mux-sync";
 import { getPublicVideo } from "@/lib/public-video";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate, formatViews, initials } from "@/lib/utils";
+import { createWebhookRepo } from "@/lib/webhook-repo";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { shortId } = await params;
   const video = await getPublicVideo(shortId);
   if (!video) return { title: "Video not found", robots: { index: false } };
+  // Private videos expose nothing to link unfurlers.
+  if (!video.isShared) return { title: "Private video", robots: { index: false } };
 
   const url = buildShareUrl(getAppUrl(), video.shortId);
   const description = video.owner.name
@@ -80,10 +84,14 @@ async function viewerUserId(): Promise<string | null> {
 
 export default async function ViewerPage({ params }: Props) {
   const { shortId } = await params;
+  // Ask Mux directly while pending, so the page never waits on a missed webhook.
+  await syncVideoByShortId(createWebhookRepo(), shortId).catch(() => undefined);
   const video = await getPublicVideo(shortId);
   if (!video) notFound();
 
   const isOwner = (await viewerUserId()) === video.ownerId;
+  // Private until the owner generates a shareable link.
+  if (!video.isShared && !isOwner) notFound();
   const shareUrl = buildShareUrl(getAppUrl(), video.shortId);
 
   return (
@@ -141,12 +149,27 @@ export default async function ViewerPage({ params }: Props) {
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          {isOwner ? (
+            <OwnerControls
+              videoId={video.id}
+              title={video.title}
+              shareUrl={shareUrl}
+              isShared={video.isShared}
+              downloadUrl={
+                video.status === "ready" && video.playbackId
+                  ? muxDownloadUrl(video.playbackId, video.title)
+                  : null
+              }
+              canEdit={video.status === "ready"}
+              editHref={`/v/${video.shortId}/edit`}
+            />
+          ) : (
             <CopyLinkButton url={shareUrl} variant="default" />
-            {isOwner && <OwnerControls videoId={video.id} title={video.title} />}
-          </div>
+          )}
         </div>
-        {video.status === "ready" && <ViewTracker videoId={video.id} />}
+        {video.status === "ready" && video.isShared && !isOwner && (
+          <ViewTracker videoId={video.id} />
+        )}
       </main>
     </>
   );

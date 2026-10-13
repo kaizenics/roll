@@ -54,18 +54,25 @@ export default function LandingPage() {
               style={{ "--i": 3 } as CSSProperties}
             >
               <Button asChild size="lg">
-                <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">
-                  <Puzzle aria-hidden />
-                  Add to Chrome, it’s free
-                </a>
-              </Button>
-              <Button asChild size="lg" variant="ghost">
-                <Link href="/dashboard">
-                  Go to dashboard
-                  <ArrowUpRight aria-hidden />
+                <Link href="/record">
+                  <span aria-hidden className="bg-record size-2.5 rounded-full" />
+                  Start recording
                 </Link>
               </Button>
+              <Button asChild size="lg" variant="ghost">
+                <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">
+                  <Puzzle aria-hidden />
+                  Add to Chrome or Edge
+                  <ArrowUpRight aria-hidden />
+                </a>
+              </Button>
             </div>
+            <p
+              className="reveal text-muted-foreground text-sm"
+              style={{ "--i": 4 } as CSSProperties}
+            >
+              Works in your browser. The extension is optional and adds one-click tab recording.
+            </p>
           </div>
         </section>
 

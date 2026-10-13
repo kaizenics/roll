@@ -10,6 +10,8 @@ import type {
   listVideosResponseSchema,
   refreshSessionRequestSchema,
   sessionUserSchema,
+  shareVideoResponseSchema,
+  trimVideoRequestSchema,
   updateVideoRequestSchema,
   videoDtoSchema,
   videoStatusSchema,
@@ -19,6 +21,8 @@ export type VideoStatus = z.infer<typeof videoStatusSchema>;
 export type VideoDTO = z.infer<typeof videoDtoSchema>;
 export type CreateVideoRequest = z.infer<typeof createVideoRequestSchema>;
 export type CreateVideoResponse = z.infer<typeof createVideoResponseSchema>;
+export type ShareVideoResponse = z.infer<typeof shareVideoResponseSchema>;
+export type TrimVideoRequest = z.infer<typeof trimVideoRequestSchema>;
 export type UpdateVideoRequest = z.infer<typeof updateVideoRequestSchema>;
 export type ListVideosResponse = z.infer<typeof listVideosResponseSchema>;
 export type ApiErrorCode = z.infer<typeof apiErrorCodeSchema>;
@@ -39,6 +43,7 @@ export interface PublicVideo {
   durationSeconds: number | null;
   aspectRatio: string | null;
   viewCount: number;
+  isShared: boolean;
   createdAt: string;
   owner: { name: string | null; avatarUrl: string | null };
 }

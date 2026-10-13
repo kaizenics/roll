@@ -18,3 +18,13 @@ export function muxAnimatedGifUrl(playbackId: string): string {
 export function muxMp4Url(playbackId: string): string {
   return `https://stream.mux.com/${playbackId}/highest.mp4`;
 }
+
+/** MP4 download with a friendly file name (Mux sets Content-Disposition). */
+export function muxDownloadUrl(playbackId: string, title: string): string {
+  const name =
+    title
+      .replace(/[^\w\- ]+/g, "")
+      .trim()
+      .replace(/\s+/g, "-") || "roll-video";
+  return `${muxMp4Url(playbackId)}?download=${encodeURIComponent(name)}.mp4`;
+}

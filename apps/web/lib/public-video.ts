@@ -20,7 +20,7 @@ export const getPublicVideo = cache(
     const { data, error } = await createSupabaseAdminClient()
       .from("videos")
       .select(
-        "id, short_id, owner_id, title, status, mux_playback_id, duration_seconds, aspect_ratio, view_count, created_at, owner:profiles(full_name, avatar_url)",
+        "id, short_id, owner_id, title, status, mux_playback_id, duration_seconds, aspect_ratio, view_count, is_shared, created_at, owner:profiles(full_name, avatar_url)",
       )
       .eq("short_id", shortId)
       .maybeSingle();
@@ -37,6 +37,7 @@ export const getPublicVideo = cache(
       durationSeconds: data.duration_seconds === null ? null : Number(data.duration_seconds),
       aspectRatio: data.aspect_ratio,
       viewCount: data.view_count,
+      isShared: data.is_shared,
       createdAt: data.created_at,
       owner: { name: data.owner?.full_name ?? null, avatarUrl: data.owner?.avatar_url ?? null },
     };

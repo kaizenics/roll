@@ -167,6 +167,55 @@ describe("handleMuxWebhook", () => {
   });
 });
 
+describe("trimming (a new asset replaces the old one)", () => {
+  const trimmedReady = {
+    type: "video.asset.ready",
+    data: {
+      id: "asset_trim",
+      passthrough: VIDEO_ID,
+      duration: 6,
+      playback_ids: [{ id: "play_trim", policy: "public" }],
+    },
+  };
+  const trimming: VideoState = {
+    status: "processing",
+    mux_asset_id: "asset_1",
+    mux_playback_id: "play_1",
+  };
+
+  it("swaps in the trimmed asset and deletes the original", async () => {
+    const memory = createMemoryRepo(trimming);
+    await deliver(memory.repo, trimmedReady);
+    expect(memory.current()).toMatchObject({
+      status: "ready",
+      mux_asset_id: "asset_trim",
+      mux_playback_id: "play_trim",
+    });
+    expect(memory.repo.deleteOrphanAsset).toHaveBeenCalledWith("asset_1");
+  });
+
+  it("falls back to the original when the trim fails", async () => {
+    const memory = createMemoryRepo(trimming);
+    await deliver(memory.repo, {
+      type: "video.asset.errored",
+      data: { id: "asset_trim", passthrough: VIDEO_ID },
+    });
+    expect(memory.current()).toMatchObject({
+      status: "ready",
+      mux_asset_id: "asset_1",
+      mux_playback_id: "play_1",
+    });
+    expect(memory.repo.deleteOrphanAsset).not.toHaveBeenCalled();
+  });
+
+  it("does not delete anything on a normal first ready", async () => {
+    const memory = createMemoryRepo(uploading);
+    await deliver(memory.repo, events.assetCreated);
+    await deliver(memory.repo, events.ready);
+    expect(memory.repo.deleteOrphanAsset).not.toHaveBeenCalled();
+  });
+});
+
 describe("computeVideoUpdate", () => {
   it("returns null for ready without a playback id", () => {
     const event = { type: "video.asset.ready" as const, data: { id: "asset_1" } };

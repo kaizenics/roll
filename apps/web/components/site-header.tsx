@@ -29,6 +29,9 @@ export async function SiteHeader({ children }: { children?: ReactNode }) {
               <Button asChild variant="ghost" size="sm">
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/record">Record</Link>
+              </Button>
               <form action="/auth/signout" method="post">
                 <Button type="submit" variant="ghost" size="sm">
                   Sign out

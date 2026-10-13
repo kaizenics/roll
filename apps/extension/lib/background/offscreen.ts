@@ -18,12 +18,8 @@ export async function ensureOffscreenDocument(): Promise<void> {
   creating ??= browser.offscreen
     .createDocument({
       url: OFFSCREEN_PATH,
-      reasons: [
-        browser.offscreen.Reason.USER_MEDIA,
-        browser.offscreen.Reason.DISPLAY_MEDIA,
-        browser.offscreen.Reason.CLIPBOARD,
-      ],
-      justification: "Record the screen, tab, microphone and upload the recording.",
+      reasons: [browser.offscreen.Reason.USER_MEDIA, browser.offscreen.Reason.DISPLAY_MEDIA],
+      justification: "Record the screen, tab and microphone, and upload the recording.",
     })
     .finally(() => {
       creating = null;

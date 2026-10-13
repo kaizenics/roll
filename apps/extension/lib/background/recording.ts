@@ -179,8 +179,7 @@ async function beginUpload(input: {
   await dispatch({ type: "UPLOAD_STARTED", recordingId, shareUrl: target.shareUrl });
 
   if (isNewVideo) {
-    // The link exists before the upload finishes; the viewer shows "Processing…".
-    await sendToOffscreen({ target: "offscreen", type: "COPY", text: target.shareUrl });
+    // Videos start private: open the owner page, where the link is generated on request.
     await browser.tabs.create({ url: target.shareUrl });
   }
 

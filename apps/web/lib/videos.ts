@@ -11,7 +11,7 @@ import type { Database, VideoRow } from "@/lib/supabase/database.types";
 type Client = SupabaseClient<Database>;
 
 export const VIDEO_COLUMNS =
-  "id, short_id, owner_id, title, status, mux_upload_id, mux_asset_id, mux_playback_id, duration_seconds, aspect_ratio, view_count, created_at, updated_at";
+  "id, short_id, owner_id, title, status, mux_upload_id, mux_asset_id, mux_playback_id, duration_seconds, aspect_ratio, view_count, is_shared, created_at, updated_at";
 
 export function parseStatus(value: string): VideoStatus {
   const parsed = videoStatusSchema.safeParse(value);
@@ -28,6 +28,7 @@ export function toVideoDTO(row: VideoRow, appUrl: string): VideoDTO {
     durationSeconds: row.duration_seconds === null ? null : Number(row.duration_seconds),
     aspectRatio: row.aspect_ratio,
     viewCount: row.view_count,
+    isShared: row.is_shared,
     shareUrl: buildShareUrl(appUrl, row.short_id),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -111,5 +112,38 @@ export async function updateVideoTitle(
 
 export async function deleteVideoRow(supabase: Client, id: string, ownerId: string): Promise<void> {
   const { error } = await supabase.from("videos").delete().eq("id", id).eq("owner_id", ownerId);
+  if (error) throw error;
+}
+
+/** Turns the public link on or off. Revoking also rotates short_id so old links die. */
+export async function setSharing(
+  supabase: Client,
+  id: string,
+  ownerId: string,
+  shared: boolean,
+  generateShortId: () => string,
+): Promise<VideoRow | null> {
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const patch = shared ? { is_shared: true } : { is_shared: false, short_id: generateShortId() };
+    const { data, error } = await supabase
+      .from("videos")
+      .update(patch)
+      .eq("id", id)
+      .eq("owner_id", ownerId)
+      .select(VIDEO_COLUMNS)
+      .maybeSingle();
+    if (!error) return data;
+    if (shared || error.code !== UNIQUE_VIOLATION) throw error;
+  }
+  throw new Error("Could not allocate a unique short id");
+}
+
+/** Marks a video as re-processing while a trimmed asset is encoded. */
+export async function markTrimming(supabase: Client, id: string, ownerId: string): Promise<void> {
+  const { error } = await supabase
+    .from("videos")
+    .update({ status: "processing" })
+    .eq("id", id)
+    .eq("owner_id", ownerId);
   if (error) throw error;
 }
