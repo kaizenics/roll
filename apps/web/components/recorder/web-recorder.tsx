@@ -7,12 +7,14 @@ import {
   RECORDING_WARNING_MS,
   type CreateVideoResponse,
 } from "@roll/shared";
-import { Link2, Loader2, Pause, Play, Square, Trash2 } from "lucide-react";
+import { Link2, Loader2, Pause, PictureInPicture2, Play, Square, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeviceSelect, ToggleRow } from "@/components/recorder/fields";
+import { FloatingControls } from "@/components/recorder/floating-controls";
 import { createVideo, shareVideo } from "@/lib/api-client";
 import {
   canRecordScreen,
@@ -23,6 +25,7 @@ import {
   requestMic,
   type RecordingSession,
 } from "@/lib/recorder/media";
+import { useFloatingWindow } from "@/lib/recorder/floating-window";
 import { uploadToMux } from "@/lib/recorder/upload";
 
 type Phase = "setup" | "countdown" | "recording" | "paused" | "uploading" | "uploaded" | "failed";
@@ -47,6 +50,9 @@ export function WebRecorder() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const previewRef = useRef<HTMLVideoElement>(null);
+  const panel = useFloatingWindow();
+  const { close: closePanel } = panel;
+  const panelSize = { width: 300, height: camera ? 340 : 120 };
   const cameraStream = useRef<MediaStream | null>(null);
   const session = useRef<RecordingSession | null>(null);
   const blob = useRef<Blob | null>(null);
@@ -149,6 +155,7 @@ export function WebRecorder() {
     if (!current) return;
     session.current = null;
     clock.current = { accumulated: elapsed(), since: 0 };
+    closePanel();
     if (document.pictureInPictureElement)
       void document.exitPictureInPicture().catch(() => undefined);
     blob.current = await finishRecording(current);
@@ -158,7 +165,7 @@ export function WebRecorder() {
       return;
     }
     void upload();
-  }, [elapsed, upload]);
+  }, [elapsed, upload, closePanel]);
 
   const discard = useCallback(() => {
     const current = session.current;
@@ -166,10 +173,11 @@ export function WebRecorder() {
     current?.recorder.stop();
     current?.release();
     blob.current = null;
+    closePanel();
     if (document.pictureInPictureElement)
       void document.exitPictureInPicture().catch(() => undefined);
     setPhase("setup");
-  }, []);
+  }, [closePanel]);
 
   // Timer, 30-minute cap and the one-minute warning.
   useEffect(() => {
@@ -190,8 +198,10 @@ export function WebRecorder() {
   async function start() {
     setError(null);
     // Both need the click's user activation, so start them before awaiting anything.
-    const pip =
-      camera && previewRef.current && document.pictureInPictureEnabled
+    // Floating controls window where supported; otherwise pop out just the camera.
+    const pip: Promise<unknown> = panel.supported
+      ? panel.open(panelSize)
+      : camera && previewRef.current && document.pictureInPictureEnabled
         ? previewRef.current.requestPictureInPicture().catch(() => null)
         : Promise.resolve(null);
     let display: MediaStream;
@@ -199,6 +209,7 @@ export function WebRecorder() {
       display = await requestDisplay();
     } catch (err) {
       await pip;
+      closePanel();
       if (document.pictureInPictureElement) void document.exitPictureInPicture();
       // NotAllowedError = the user closed the picker; that is not an error.
       if (!(err instanceof DOMException && err.name === "NotAllowedError")) setError(message(err));
@@ -263,9 +274,24 @@ export function WebRecorder() {
   const microphones = devices.filter((d) => d.kind === "audioinput");
   const cameras = devices.filter((d) => d.kind === "videoinput");
   const busy = phase !== "setup" && phase !== "failed";
+  const live = phase === "countdown" || phase === "recording" || phase === "paused";
 
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_18rem] md:items-start">
+      {live &&
+        panel.floating &&
+        createPortal(
+          <FloatingControls
+            phase={phase}
+            countdown={countdown}
+            elapsedMs={elapsedMs}
+            camera={camera ? cameraStream.current : null}
+            onTogglePause={togglePause}
+            onStop={() => void stop()}
+            onDiscard={discard}
+          />,
+          panel.floating.document.body,
+        )}
       <div className="bg-card relative flex aspect-video items-center justify-center overflow-hidden rounded-xl border">
         <video
           ref={previewRef}
@@ -412,6 +438,12 @@ export function WebRecorder() {
                 <Trash2 aria-hidden />
                 Discard
               </Button>
+              {panel.supported && !panel.floating && (
+                <Button variant="outline" onClick={() => void panel.open(panelSize)}>
+                  <PictureInPicture2 aria-hidden />
+                  Pop out controls
+                </Button>
+              )}
             </div>
           )
         )}
