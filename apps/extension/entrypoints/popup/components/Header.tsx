@@ -12,9 +12,12 @@ export function Header({
 }) {
   const label = user?.name ?? user?.email ?? "";
   return (
-    <header className="flex items-center gap-3 border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-      <span aria-hidden className="bg-brand flex size-7 items-center justify-center rounded-full">
-        <span className="size-2.5 rounded-full bg-white" />
+    <header className="flex items-center gap-3 border-b border-stone-200 px-4 py-3 dark:border-stone-800">
+      <span
+        aria-hidden
+        className="flex size-7 items-center justify-center rounded-full bg-stone-900 dark:bg-stone-100"
+      >
+        <span className="bg-record size-2.5 rounded-full" />
       </span>
       <span className="font-semibold">Roll</span>
       {user && (
@@ -27,7 +30,7 @@ export function Header({
               referrerPolicy="no-referrer"
             />
           ) : (
-            <span className="flex size-7 items-center justify-center rounded-full bg-zinc-200 text-xs font-semibold dark:bg-zinc-700">
+            <span className="flex size-7 items-center justify-center rounded-full bg-stone-200 text-xs font-semibold dark:bg-stone-700">
               {label.slice(0, 1).toUpperCase()}
             </span>
           )}
@@ -36,7 +39,7 @@ export function Header({
           </span>
           <button
             type="button"
-            className="rounded text-xs text-zinc-500 hover:underline"
+            className="rounded text-xs text-stone-500 hover:underline"
             onClick={async () => {
               await sendToBackground({ target: "background", type: "SIGN_OUT" });
               onSignedOut();
@@ -49,7 +52,7 @@ export function Header({
       {!user && (
         <button
           type="button"
-          className="ml-auto rounded text-xs text-zinc-500 hover:underline"
+          className="ml-auto rounded text-xs text-stone-500 hover:underline"
           onClick={() => void browser.tabs.create({ url: DASHBOARD_URL })}
         >
           Open Roll

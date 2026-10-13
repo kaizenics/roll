@@ -47,14 +47,14 @@ const BADGE: Partial<Record<RecorderState["status"], { text: string; color: stri
   countdown: { text: "•", color: "#dc2626" },
   recording: { text: "REC", color: "#dc2626" },
   paused: { text: "❚❚", color: "#d97706" },
-  stopping: { text: "…", color: "#6d5dfc" },
+  stopping: { text: "…", color: "#57534e" },
   error: { text: "!", color: "#dc2626" },
 };
 
 async function updateBadge(state: RecorderState): Promise<void> {
   const badge =
     state.status === "uploading"
-      ? { text: `${state.progress}%`, color: "#6d5dfc" }
+      ? { text: `${state.progress}%`, color: "#57534e" }
       : BADGE[state.status];
   await browser.action.setBadgeText({ text: badge?.text ?? "" });
   if (badge) await browser.action.setBadgeBackgroundColor({ color: badge.color });
