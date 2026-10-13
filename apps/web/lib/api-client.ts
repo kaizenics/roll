@@ -2,8 +2,10 @@
 
 import {
   apiErrorSchema,
+  createVideoResponseSchema,
   listVideosResponseSchema,
   videoDtoSchema,
+  type CreateVideoResponse,
   type VideoDTO,
 } from "@roll/shared";
 
@@ -24,6 +26,11 @@ async function request(path: string, init?: RequestInit): Promise<Response> {
     throw new ApiClientError(parsed.success ? parsed.data.error.message : "Request failed");
   }
   return response;
+}
+
+export async function createVideo(): Promise<CreateVideoResponse> {
+  const response = await request("/api/videos", { method: "POST", body: "{}" });
+  return createVideoResponseSchema.parse(await response.json());
 }
 
 export async function fetchVideos(): Promise<VideoDTO[]> {

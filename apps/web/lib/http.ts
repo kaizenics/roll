@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { z } from "zod";
 import type { ApiError, ApiErrorCode } from "@roll/shared";
-import { getExtensionOrigin } from "@/lib/env";
+import { getAppUrl, getExtensionOrigin } from "@/lib/env";
 
 const STATUS_BY_CODE: Record<ApiErrorCode, number> = {
   bad_request: 400,
@@ -76,4 +76,14 @@ export function preflight(request: Request): Response {
 export function clientIp(request: Request): string {
   const forwarded = request.headers.get("x-forwarded-for");
   return forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+}
+
+/**
+ * Origin Mux should allow for the browser upload: the caller when it is the
+ * web app or the configured extension, otherwise the web app.
+ */
+export function uploadCorsOrigin(request: Request): string {
+  const appOrigin = new URL(getAppUrl()).origin;
+  const origin = request.headers.get("origin");
+  return origin && (origin === appOrigin || origin === getExtensionOrigin()) ? origin : appOrigin;
 }

@@ -7,7 +7,7 @@ import {
 } from "@roll/shared";
 import { getRequestAuth } from "@/lib/auth";
 import { getAppUrl } from "@/lib/env";
-import { apiError, parseJsonBody, preflight } from "@/lib/http";
+import { apiError, parseJsonBody, preflight, uploadCorsOrigin } from "@/lib/http";
 import { createDirectUpload } from "@/lib/mux";
 import { rateLimit } from "@/lib/rate-limit";
 import { handle } from "@/lib/route";
@@ -56,7 +56,7 @@ export function POST(request: Request) {
     const id = crypto.randomUUID();
     let upload;
     try {
-      upload = await createDirectUpload(id);
+      upload = await createDirectUpload(id, uploadCorsOrigin(request));
     } catch (error) {
       console.error("Mux direct upload creation failed", error);
       return apiError("upstream_error", "Video service is unavailable. Please try again.");

@@ -9,10 +9,11 @@
   your clipboard.
 </p>
 
-Roll is a Chrome extension (Manifest V3) plus a Next.js web app. The extension records your screen,
-a window or the current tab, with your microphone and a draggable camera bubble. When you stop, the
-share link (`https://<app>/v/<shortId>`) is copied and opened while the video uploads to Mux in the
-background.
+Roll is a Next.js web app with an optional Chrome/Edge extension. You can record straight from
+the browser at `/record` (screen, window or tab through the browser's share picker, your
+microphone, and a camera bubble in a picture-in-picture window). The extension adds one-click tab
+recording and an on-page camera bubble and controls. Either way, when you stop, the share link
+(`https://<app>/v/<shortId>`) is copied and the video uploads to Mux in the background.
 
 | Package           | Stack                           | Role                                           |
 | ----------------- | ------------------------------- | ---------------------------------------------- |

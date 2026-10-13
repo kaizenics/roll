@@ -89,6 +89,9 @@ importers:
       '@mux/ts':
         specifier: ^15.6.1
         version: 15.6.1
+      '@mux/upchunk':
+        specifier: ^3.5.0
+        version: 3.5.0
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.15
         version: 1.1.24(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)

@@ -1,6 +1,6 @@
 import "server-only";
 import Mux from "@mux/ts";
-import { getExtensionOrigin, getServerEnv } from "@/lib/env";
+import { getServerEnv } from "@/lib/env";
 
 let client: Mux | undefined;
 
@@ -20,10 +20,13 @@ export interface DirectUpload {
   uploadUrl: string;
 }
 
-export async function createDirectUpload(videoId: string): Promise<DirectUpload> {
+/** `corsOrigin` is the browser origin allowed to PUT the file (web app or extension). */
+export async function createDirectUpload(
+  videoId: string,
+  corsOrigin: string,
+): Promise<DirectUpload> {
   const upload = await mux().video.uploads.create({
-    // The browser PUT comes from the extension's offscreen document.
-    cors_origin: getExtensionOrigin() ?? "*",
+    cors_origin: corsOrigin,
     timeout: UPLOAD_TIMEOUT_SECONDS,
     new_asset_settings: {
       playback_policies: ["public"],
