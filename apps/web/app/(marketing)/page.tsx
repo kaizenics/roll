@@ -17,6 +17,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { BlurText } from "@/components/landing/blur-text";
 import { HeroVisual } from "@/components/landing/hero-visual";
 import { RecordModes } from "@/components/landing/record-modes";
 import { EdgeBlur } from "@/components/edge-blur";
@@ -175,9 +176,9 @@ const QUESTIONS = [
 function SectionHeading({ id, eyebrow, title }: { id: string; eyebrow: string; title: string }) {
   return (
     <div className="mb-12 max-w-2xl">
-      <p className="text-muted-foreground mb-3 text-sm">{eyebrow}</p>
+      <p className="text-muted-foreground scroll-reveal mb-3 text-sm">{eyebrow}</p>
       <h2 id={id} className="font-serif text-4xl leading-[1.08] tracking-[-0.015em] sm:text-5xl">
-        {title}
+        <BlurText text={title} />
       </h2>
     </div>
   );
@@ -255,7 +256,7 @@ export default function LandingPage() {
                 eyebrow="How it works"
                 title="From idea to link in under a minute."
               />
-              <p className="text-muted-foreground -mt-6 max-w-[42ch]">
+              <p className="text-muted-foreground scroll-reveal -mt-6 max-w-[42ch]">
                 No scheduling, no screen-share call. Record once, and people watch when it suits
                 them.
               </p>
@@ -313,7 +314,7 @@ export default function LandingPage() {
                 eyebrow="Two ways to record"
                 title="Start in the browser. Add the extension if you like."
               />
-              <p className="text-muted-foreground -mt-6 max-w-[48ch]">
+              <p className="text-muted-foreground scroll-reveal -mt-6 max-w-[48ch]">
                 Both save to the same library, with the same links, editor and privacy. Pick
                 whichever fits how you work.
               </p>
@@ -328,12 +329,12 @@ export default function LandingPage() {
         <section aria-labelledby="privacy" className="border-t">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 md:grid-cols-[1fr_1.4fr] md:py-32">
             <div>
-              <p className="text-muted-foreground mb-3 text-sm">Privacy</p>
+              <p className="text-muted-foreground scroll-reveal mb-3 text-sm">Privacy</p>
               <h2
                 id="privacy"
                 className="font-serif text-4xl leading-[1.08] tracking-[-0.015em] sm:text-5xl"
               >
-                Your recordings stay yours.
+                <BlurText text="Your recordings stay yours." />
               </h2>
             </div>
             <ul className="grid gap-x-10 gap-y-9 sm:grid-cols-2">
@@ -369,9 +370,12 @@ export default function LandingPage() {
         <section className="border-t">
           <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-24 sm:px-6 md:flex-row md:items-end md:justify-between md:py-32">
             <h2 className="max-w-xl font-serif text-5xl leading-[1.04] tracking-[-0.02em] sm:text-6xl">
-              Skip the meeting. <span className="text-muted-foreground italic">Send a Roll.</span>
+              <BlurText text="Skip the meeting." />{" "}
+              <span className="text-muted-foreground italic">
+                <BlurText text="Send a Roll." offset={3} />
+              </span>
             </h2>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="scroll-reveal">
               <Link href="/record">
                 <span aria-hidden className="bg-record size-2.5 rounded-full" />
                 Record your first video

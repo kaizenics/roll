@@ -141,14 +141,43 @@
   }
 }
 
-/* Scroll-in reveal driven by CSS scroll timelines (no JS, nothing can stay hidden). */
+/* Apple-style scroll focus, driven by CSS scroll timelines (no JS, so nothing
+   can get stuck hidden; unsupported browsers simply show everything).
+   - .scroll-reveal: blurs in entering from the bottom, sharp mid-screen, blurs
+     out leaving at the top.
+   - .blur-word: headings come into focus word by word as they scroll in. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .scroll-reveal {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 35%;
+      animation:
+        focus-in linear both,
+        focus-out linear both;
+      animation-timeline: view(), view();
+      animation-range:
+        entry 0% cover 22%,
+        exit 25% exit 100%;
     }
+    .blur-word {
+      display: inline-block;
+      animation: focus-in linear both;
+      animation-timeline: view();
+      animation-range: entry calc(var(--i, 0) * 4%) cover calc(10% + var(--i, 0) * 2.5%);
+    }
+  }
+}
+
+@keyframes focus-in {
+  from {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(22px);
+  }
+}
+@keyframes focus-out {
+  to {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(-22px);
   }
 }
 
