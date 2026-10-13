@@ -1,49 +1,87 @@
-# Roll
+<p align="center">
+  <img src="apps/web/app/icon.svg" width="72" height="72" alt="Roll logo" />
+</p>
 
-A Loom-style screen recorder: a Chrome extension (MV3) records your screen, window or tab with
-microphone and a webcam bubble; when you stop, the share link (`https://<app>/v/<shortId>`) is
-copied to your clipboard and opened while the video uploads to Mux in the background.
+<h1 align="center">Roll</h1>
 
-```
-apps/extension   WXT + React 18 + Tailwind   (Chrome MV3 extension)
-apps/web         Next.js 15 + Tailwind + shadcn/ui (landing, auth, dashboard, viewer, API)
-packages/shared  zod schemas, types, constants shared by both apps
-supabase/        SQL migrations (Postgres + RLS)
-```
+<p align="center">
+  Record your screen, camera and voice from Chrome. Press stop and the share link is already on
+  your clipboard.
+</p>
+
+Roll is a Chrome extension (Manifest V3) plus a Next.js web app. The extension records your screen,
+a window or the current tab, with your microphone and a draggable camera bubble. When you stop, the
+share link (`https://<app>/v/<shortId>`) is copied and opened while the video uploads to Mux in the
+background.
+
+| Package           | Stack                           | Role                                           |
+| ----------------- | ------------------------------- | ---------------------------------------------- |
+| `apps/extension`  | WXT, React 18, Tailwind         | Chrome extension that records and uploads      |
+| `apps/web`        | Next.js 15, Tailwind, shadcn/ui | Landing, sign-in, dashboard, viewer and API    |
+| `packages/shared` | zod                             | Schemas, types and constants used by both apps |
+| `supabase/`       | SQL                             | Postgres migrations with row-level security    |
 
 ## Architecture
 
-```
- ┌──────────────────────── Chrome extension ────────────────────────┐
- │  popup (React) ──msg──► background service worker ◄──msg── page UI │
- │                          │  state machine, auth,      (shadow DOM:  │
- │                          │  badge, orchestration      controls pill,│
- │                          ▼                            camera bubble)│
- │                   offscreen document                                │
- │      getDisplayMedia / tabCapture stream → Web Audio mix (+mic)      │
- │      → MediaRecorder (webm, 1s chunks → memory + IndexedDB)          │
- │      → UpChunk upload ──────────────────────────────┐               │
- │  auth-bridge content script (only on /extension/connect)           │
- └──────────────┬───────────────────────────────────────┼─────────────┘
-       Bearer token │ POST /api/videos            PUT chunks│
-                    ▼                                       ▼
- ┌────────────── Next.js (Vercel) ──────────────┐   ┌──────────── Mux ───────────┐
- │ /api/videos  → creates row + Mux direct upload │──►│ Direct Upload → Asset      │
- │ /api/webhooks/mux ◄─ signed webhooks ──────────┼───│ (asset_created, ready, …)  │
- │ /v/[shortId] viewer (MuxPlayer, OG tags)       │   └────────────────────────────┘
- │ /dashboard, /login, /extension/connect         │
- └──────────────┬─────────────────────────────────┘
-                ▼
-        Supabase (Auth + Postgres with RLS)
+```mermaid
+flowchart LR
+  subgraph EXT["Chrome extension"]
+    direction TB
+    popup["Popup<br/>React"]
+    bg["Background service worker<br/>state machine, auth, badge"]
+    page["Page UI<br/>controls pill, camera bubble"]
+    off["Offscreen document<br/>capture, audio mix, MediaRecorder"]
+    bridge["Auth bridge<br/>only on /extension/connect"]
+    popup <--> bg
+    page <--> bg
+    bg --> off
+    bridge --> bg
+  end
+
+  subgraph WEB["Next.js on Vercel"]
+    direction TB
+    api["/api/videos<br/>create video + upload URL"]
+    hook["/api/webhooks/mux<br/>signed, idempotent"]
+    pages["/v/:shortId viewer<br/>/dashboard, /login"]
+  end
+
+  mux[("Mux<br/>direct upload, encoding, playback")]
+  db[("Supabase<br/>Auth + Postgres with RLS")]
+
+  bg -- "Bearer token" --> api
+  off -- "chunked upload" --> mux
+  api -- "create direct upload" --> mux
+  mux -- "asset_created, ready, errored" --> hook
+  api --> db
+  hook --> db
+  pages --> db
+  pages -- "MuxPlayer" --> mux
 ```
 
-**Recording flow:** popup → background asks the offscreen document for streams (Chrome's picker
-for screen/window; `tabCapture.getMediaStreamId` for the current tab) → controls + camera bubble
-are injected into the page → 3‑2‑1 countdown → recording. On stop, the background calls
-`POST /api/videos`, gets `{ shareUrl, uploadUrl }`, copies and opens the link, and the offscreen
-document uploads the blob with UpChunk (3 retries with backoff; the blob stays in IndexedDB until
-the upload succeeds). Mux webhooks move the video `uploading → processing → ready`, and the viewer
-page refreshes itself until it is playable.
+### Recording flow
+
+```mermaid
+sequenceDiagram
+  actor U as You
+  participant E as Extension
+  participant A as Roll API
+  participant M as Mux
+  participant V as Viewer page
+
+  U->>E: Start recording
+  E->>E: Pick source, 3-2-1 countdown, record
+  U->>E: Stop
+  E->>A: POST /api/videos
+  A->>M: Create direct upload
+  A-->>E: shareUrl + uploadUrl
+  E->>U: Copy link and open viewer
+  E->>M: Upload in chunks (3 retries, kept in IndexedDB)
+  M->>A: Webhook: asset ready
+  V->>A: Polls every 3s until playable
+```
+
+The video moves through `uploading`, `processing` and `ready` (or `errored`). Recordings stay in
+IndexedDB until the upload succeeds, so a failed upload can be retried from the popup.
 
 ### Why these MV3 choices
 
