@@ -206,18 +206,14 @@ export default function LandingPage() {
       <main id="main" className="overflow-x-clip">
         {/* Hero: one giant word with the 3D mark over it; the mark turns as you scroll. */}
         <section className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col px-4 pb-20 pt-6 sm:px-6 md:pb-24">
-          <p className="reveal text-muted-foreground mx-auto w-full max-w-7xl text-sm">
-            Async video for busy teams
-          </p>
-
           <div className="relative flex flex-1 items-center justify-center py-10">
             <h1 className="reveal select-none text-center" style={stagger(1)}>
               <span className="sr-only">Roll: say it with a video, share it with a link.</span>
               <span
                 aria-hidden
-                className="block text-[clamp(4.25rem,18.5vw,19rem)] font-normal uppercase leading-[0.82] tracking-[-0.055em]"
+                className="block text-[clamp(4.5rem,21vw,23rem)] font-semibold uppercase leading-[0.82] tracking-[-0.06em]"
               >
-                <span className="text-record">Roll</span>ing
+                <span className="text-record">Cap</span>ture
               </span>
             </h1>
             {/* Overlaps the word; never blocks clicks or text selection below it. */}
