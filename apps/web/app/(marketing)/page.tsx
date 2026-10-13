@@ -204,25 +204,41 @@ export default function LandingPage() {
       </SiteHeader>
 
       <main id="main" className="overflow-x-clip">
-        {/* Hero */}
-        <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-20 pt-14 sm:px-6 md:grid-cols-[1.05fr_1fr] md:pb-28 md:pt-20">
-          <div className="flex flex-col gap-6">
-            <p className="reveal text-muted-foreground text-sm">Async video for busy teams</p>
-            <h1
-              className="reveal font-serif text-5xl leading-[1.02] tracking-[-0.02em] sm:text-7xl"
-              style={stagger(1)}
-            >
-              Say it with a video.
-              <br />
-              <span className="text-muted-foreground italic">Share it with a link.</span>
+        {/* Hero: one giant word with the 3D mark over it; the mark turns as you scroll. */}
+        <section className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col px-4 pb-20 pt-6 sm:px-6 md:pb-24">
+          <p className="reveal text-muted-foreground mx-auto w-full max-w-7xl text-sm">
+            Async video for busy teams
+          </p>
+
+          <div className="relative flex flex-1 items-center justify-center py-10">
+            <h1 className="reveal select-none text-center" style={stagger(1)}>
+              <span className="sr-only">Roll: say it with a video, share it with a link.</span>
+              <span
+                aria-hidden
+                className="block text-[clamp(4.25rem,18.5vw,19rem)] font-normal uppercase leading-[0.82] tracking-[-0.055em]"
+              >
+                <span className="text-record">Roll</span>ing
+              </span>
             </h1>
-            <p className="reveal text-muted-foreground max-w-[50ch] text-lg" style={stagger(2)}>
-              Record your screen, camera and voice straight from the browser. Trim it, then share a
-              private-by-default link or embed it anywhere. No meeting required.
-            </p>
+            {/* Overlaps the word; never blocks clicks or text selection below it. */}
             <div
-              className="reveal flex flex-col gap-3 pt-1 sm:flex-row sm:items-center"
-              style={stagger(3)}
+              className="reveal pointer-events-none absolute -inset-y-6 inset-x-0 mx-auto max-w-5xl"
+              style={stagger(2)}
+            >
+              <HeroVisual />
+            </div>
+          </div>
+
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="reveal max-w-md" style={stagger(3)}>
+              <p className="text-lg leading-snug">
+                Say it with a video. Record your screen, camera and voice from the browser.
+              </p>
+              <p className="text-record/90 text-lg italic leading-snug">Share it with a link.</p>
+            </div>
+            <div
+              className="reveal flex flex-col gap-2 sm:flex-row sm:items-center"
+              style={stagger(4)}
             >
               <Button asChild size="lg">
                 <Link href="/record">
@@ -238,12 +254,6 @@ export default function LandingPage() {
                 </a>
               </Button>
             </div>
-            <p className="reveal text-muted-foreground text-sm" style={stagger(4)}>
-              No install needed. The extension is optional.
-            </p>
-          </div>
-          <div className="reveal flex justify-center md:justify-end" style={stagger(2)}>
-            <HeroVisual />
           </div>
         </section>
 

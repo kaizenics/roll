@@ -193,6 +193,7 @@ export function HeroScene({ onUnsupported }: { onUnsupported: () => void }) {
     shadow.position.y = -2.15;
     scene.add(shadow);
 
+    let shadowOpacity = 0.35;
     const applyTheme = () => {
       const foreground = themeColor("--foreground", "#1f1e1c");
       const background = themeColor("--background", "#fbfbfa");
@@ -200,7 +201,8 @@ export function HeroScene({ onUnsupported }: { onUnsupported: () => void }) {
       glassMaterial.color.copy(foreground);
       barMaterial.color.copy(foreground);
       ringMaterial.color.copy(background);
-      shadowMaterial.opacity = document.documentElement.classList.contains("dark") ? 0.8 : 0.35;
+      shadowOpacity = document.documentElement.classList.contains("dark") ? 0.8 : 0.35;
+      shadowMaterial.opacity = shadowOpacity;
     };
     applyTheme();
     const themeObserver = new MutationObserver(applyTheme);
@@ -217,7 +219,7 @@ export function HeroScene({ onUnsupported }: { onUnsupported: () => void }) {
       renderer.domElement.style.height = "100%";
       camera.aspect = width / height;
       // Pull back on narrow (portrait) layouts so the whole mark stays in view.
-      camera.position.z = camera.aspect < 1 ? 11.5 : 9;
+      camera.position.z = camera.aspect < 1 ? 26 : 13.5;
       camera.updateProjectionMatrix();
     };
     const resizeObserver = new ResizeObserver(resize);
@@ -232,12 +234,24 @@ export function HeroScene({ onUnsupported }: { onUnsupported: () => void }) {
       pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
     };
 
+    // 0 while the hero is in place, 1 once it has scrolled fully out of view.
+    const section = host.closest("section") ?? host;
+    const scrollProgress = () => {
+      const rect = section.getBoundingClientRect();
+      return Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
+    };
+    let scroll = 0;
+
     const pose = (t: number) => {
-      const targetY = -0.35 + pointer.x * 0.35 + Math.sin(t * 0.35) * 0.08;
-      const targetX = 0.12 + pointer.y * 0.22;
+      scroll += (scrollProgress() - scroll) * 0.12; // eased, so fast scrolls stay smooth
+      const targetY = -0.35 + pointer.x * 0.35 + Math.sin(t * 0.35) * 0.08 + scroll * Math.PI * 1.1;
+      const targetX = 0.12 + pointer.y * 0.22 + scroll * 0.9;
       mark.rotation.y += (targetY - mark.rotation.y) * 0.06;
       mark.rotation.x += (targetX - mark.rotation.x) * 0.06;
-      mark.position.y = Math.sin(t * 0.8) * 0.06;
+      mark.rotation.z = scroll * -0.35;
+      mark.position.y = Math.sin(t * 0.8) * 0.06 - scroll * 1.6;
+      mark.scale.setScalar(1 + scroll * 0.35);
+      shadowMaterial.opacity = shadowOpacity * (1 - scroll);
       bubble.position.z = 0.42 + Math.sin(t * 1.6) * 0.06;
       bubble.scale.setScalar(1 + Math.sin(t * 3.2) * 0.025);
       bars.forEach((bar, i) => {
