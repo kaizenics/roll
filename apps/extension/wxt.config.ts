@@ -11,6 +11,8 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   // Load `.output/chrome-mv3-dev` into your own Chrome profile instead (stable extension ID).
   webExt: { disabled: true },
+  // WXT defaults to the first free port from 3000, which collides with the Next.js app.
+  dev: { server: { port: 3010 } },
   zip: { artifactTemplate: "roll-{{packageVersion}}-{{browser}}.zip" },
   vite: () => ({
     plugins: [tailwindcss()],
