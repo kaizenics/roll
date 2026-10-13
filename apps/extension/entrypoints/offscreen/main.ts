@@ -30,17 +30,6 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function copyToClipboard(text: string): void {
-  // navigator.clipboard requires a focused document, which an offscreen
-  // document never is; execCommand works with the CLIPBOARD reason.
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  document.body.append(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-}
-
 async function upload(recordingId: string, uploadUrl: string): Promise<void> {
   try {
     const blob = finished.get(recordingId) ?? (await readRecordingBlob(recordingId));
@@ -107,9 +96,6 @@ async function handle(message: OffscreenRequest): Promise<OffscreenResponse> {
     }
     case "UPLOAD":
       void upload(message.recordingId, message.uploadUrl);
-      return { ok: true };
-    case "COPY":
-      copyToClipboard(message.text);
       return { ok: true };
   }
 }
