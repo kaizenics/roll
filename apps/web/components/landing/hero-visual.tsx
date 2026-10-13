@@ -23,12 +23,8 @@ export function HeroVisual() {
   const onUnsupported = useCallback(() => setUnsupported(true), []);
 
   return (
-    <div className="relative aspect-square w-full max-w-[560px] md:aspect-[5/4]">
-      {/* Ambient glow behind the mark. */}
-      <div
-        aria-hidden
-        className="bg-record/10 dark:bg-record/15 absolute inset-[18%] rounded-full blur-3xl"
-      />
+    // Fills its container; the hero decides the size.
+    <div className="relative size-full">
       <div className="relative size-full">
         {unsupported ? <StaticMark /> : <HeroScene onUnsupported={onUnsupported} />}
       </div>
