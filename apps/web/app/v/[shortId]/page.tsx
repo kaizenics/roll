@@ -10,9 +10,11 @@ import { ProcessingRefresher } from "@/components/viewer/processing-refresher";
 import { VideoPlayer } from "@/components/viewer/video-player";
 import { ViewTracker } from "@/components/viewer/view-tracker";
 import { getAppUrl } from "@/lib/env";
+import { syncVideoByShortId } from "@/lib/mux-sync";
 import { getPublicVideo } from "@/lib/public-video";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatDate, formatViews, initials } from "@/lib/utils";
+import { createWebhookRepo } from "@/lib/webhook-repo";
 
 export const dynamic = "force-dynamic";
 
@@ -82,6 +84,8 @@ async function viewerUserId(): Promise<string | null> {
 
 export default async function ViewerPage({ params }: Props) {
   const { shortId } = await params;
+  // Ask Mux directly while pending, so the page never waits on a missed webhook.
+  await syncVideoByShortId(createWebhookRepo(), shortId).catch(() => undefined);
   const video = await getPublicVideo(shortId);
   if (!video) notFound();
 

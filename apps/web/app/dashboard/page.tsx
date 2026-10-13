@@ -4,7 +4,9 @@ import { VideoGrid } from "@/components/dashboard/video-grid";
 import { SiteHeader } from "@/components/site-header";
 import { getAppUrl } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { syncPendingVideos } from "@/lib/mux-sync";
 import { listVideosForOwner, toVideoDTO } from "@/lib/videos";
+import { createWebhookRepo } from "@/lib/webhook-repo";
 
 export const metadata: Metadata = { title: "Your videos" };
 export const dynamic = "force-dynamic";
@@ -17,9 +19,11 @@ export default async function DashboardPage() {
   if (!user) redirect("/login?next=/dashboard");
 
   const appUrl = getAppUrl();
-  const videos = (await listVideosForOwner(supabase, user.id)).map((row) =>
-    toVideoDTO(row, appUrl),
-  );
+  let rows = await listVideosForOwner(supabase, user.id);
+  if (await syncPendingVideos(createWebhookRepo(), rows)) {
+    rows = await listVideosForOwner(supabase, user.id);
+  }
+  const videos = rows.map((row) => toVideoDTO(row, appUrl));
 
   return (
     <>

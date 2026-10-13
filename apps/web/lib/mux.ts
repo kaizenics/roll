@@ -62,6 +62,14 @@ export async function createTrimmedAsset(
   return asset.id;
 }
 
+export function getUpload(uploadId: string) {
+  return mux().video.uploads.retrieve(uploadId);
+}
+
+export function getAsset(assetId: string) {
+  return mux().video.assets.retrieve(assetId);
+}
+
 function isNotFound(error: unknown): boolean {
   return error instanceof Mux.APIError && error.status === 404;
 }

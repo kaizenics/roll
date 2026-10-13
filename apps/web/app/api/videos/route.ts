@@ -9,10 +9,12 @@ import { getRequestAuth } from "@/lib/auth";
 import { getAppUrl } from "@/lib/env";
 import { apiError, parseJsonBody, preflight, uploadCorsOrigin } from "@/lib/http";
 import { createDirectUpload } from "@/lib/mux";
+import { syncPendingVideos } from "@/lib/mux-sync";
 import { rateLimit } from "@/lib/rate-limit";
 import { handle } from "@/lib/route";
 import { generateShortId } from "@/lib/shortid";
 import { insertVideo, listVideosForOwner, toVideoDTO } from "@/lib/videos";
+import { createWebhookRepo } from "@/lib/webhook-repo";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +30,10 @@ export function GET(request: Request) {
     const auth = await getRequestAuth(request);
     if (!auth) return apiError("unauthorized", "Sign in to view your videos");
 
-    const rows = await listVideosForOwner(auth.supabase, auth.userId);
+    let rows = await listVideosForOwner(auth.supabase, auth.userId);
+    if (await syncPendingVideos(createWebhookRepo(), rows)) {
+      rows = await listVideosForOwner(auth.supabase, auth.userId);
+    }
     const appUrl = getAppUrl();
     return NextResponse.json<ListVideosResponse>(
       { videos: rows.map((row) => toVideoDTO(row, appUrl)) },
