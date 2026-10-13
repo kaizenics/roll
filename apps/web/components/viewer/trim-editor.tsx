@@ -3,6 +3,8 @@
 import MuxPlayer, { type MuxPlayerRefAttributes } from "@mux/mux-player-react";
 import { muxThumbnailUrl } from "@roll/shared";
 import {
+  ArrowLeft,
+  ArrowRight,
   ChevronLeft,
   Loader2,
   Pause,
@@ -58,6 +60,18 @@ function ToolButton({
     >
       {children}
     </button>
+  );
+}
+
+/** Keyboard key cap, styled after shadcn/ui's Kbd. */
+function Kbd({ children, ...props }: { children: ReactNode; "aria-label"?: string }) {
+  return (
+    <kbd
+      {...props}
+      className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/15 bg-white/5 px-1 font-sans text-[11px] font-medium text-white/80 shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)] [&_svg]:size-3"
+    >
+      {children}
+    </kbd>
   );
 }
 
@@ -360,16 +374,23 @@ export function TrimEditor({
             </span>{" "}
             ({formatTimecode(kept)})
           </span>
-          <span className="hidden gap-4 sm:flex">
-            <span>
-              <kbd className="font-mono text-white/80">Space</kbd> play
+          <span className="hidden items-center gap-4 sm:flex">
+            <span className="flex items-center gap-1.5">
+              <Kbd>Space</Kbd> play
             </span>
-            <span>
-              <kbd className="font-mono text-white/80">← →</kbd> nudge
+            <span className="flex items-center gap-1.5">
+              <Kbd aria-label="Left arrow">
+                <ArrowLeft />
+              </Kbd>
+              <Kbd aria-label="Right arrow">
+                <ArrowRight />
+              </Kbd>
+              nudge
             </span>
-            <span>
-              <kbd className="font-mono text-white/80">I</kbd> /{" "}
-              <kbd className="font-mono text-white/80">O</kbd> set start / end
+            <span className="flex items-center gap-1.5">
+              <Kbd>I</Kbd>
+              <Kbd>O</Kbd>
+              set start / end
             </span>
           </span>
         </div>
