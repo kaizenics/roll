@@ -32,6 +32,7 @@ export const videoDtoSchema = z.object({
   durationSeconds: z.number().nullable(),
   aspectRatio: z.string().nullable(),
   viewCount: z.number().int().nonnegative(),
+  isShared: z.boolean(),
   shareUrl: z.url(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -47,6 +48,22 @@ export const createVideoResponseSchema = z.object({
   uploadUrl: z.url(),
   shareUrl: z.url(),
 });
+
+export const shareVideoResponseSchema = z.object({
+  shortId: z.string(),
+  shareUrl: z.url(),
+  isShared: z.boolean(),
+});
+
+/** Trim window in seconds, applied to the current asset. */
+export const trimVideoRequestSchema = z
+  .object({
+    startSeconds: z.number().min(0),
+    endSeconds: z.number().positive(),
+  })
+  .refine((v) => v.endSeconds - v.startSeconds >= 1, {
+    message: "The trimmed video must be at least 1 second long",
+  });
 
 export const updateVideoRequestSchema = z.object({
   title: titleSchema,

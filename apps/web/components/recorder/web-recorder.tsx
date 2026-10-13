@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeviceSelect, ToggleRow } from "@/components/recorder/fields";
-import { createVideo } from "@/lib/api-client";
+import { createVideo, shareVideo } from "@/lib/api-client";
 import {
   canRecordScreen,
   createRecordingSession,
@@ -118,9 +118,18 @@ export function WebRecorder() {
 
   // The link is only revealed and copied when the user asks for it.
   async function generateLink() {
-    const url = target.current?.shareUrl;
-    if (!url) return;
-    setShareUrl(url);
+    const video = target.current;
+    if (!video) return;
+    let url = shareUrl;
+    if (!url) {
+      try {
+        url = (await shareVideo(video.id)).shareUrl;
+      } catch (err) {
+        toast.error(message(err));
+        return;
+      }
+      setShareUrl(url);
+    }
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Link copied to clipboard");

@@ -94,7 +94,16 @@ export function VideoCard({
           </span>
         </p>
         <div className="flex items-center justify-between gap-2 pt-1">
-          <CopyLinkButton url={video.shareUrl} />
+          {video.isShared ? (
+            <CopyLinkButton url={video.shareUrl} />
+          ) : (
+            <Link
+              href={href}
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
+              Private. Open to share
+            </Link>
+          )}
           <DeleteVideoButton
             videoId={video.id}
             title={video.title}

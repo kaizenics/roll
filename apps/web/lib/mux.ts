@@ -40,6 +40,28 @@ export async function createDirectUpload(
   return { uploadId: upload.id, uploadUrl: upload.url };
 }
 
+/**
+ * Creates a trimmed copy of an existing asset. The webhook swaps it in when
+ * ready and deletes the original, so a failed trim leaves the video intact.
+ */
+export async function createTrimmedAsset(
+  videoId: string,
+  sourceAssetId: string,
+  startSeconds: number,
+  endSeconds: number,
+): Promise<string> {
+  const asset = await mux().video.assets.create({
+    inputs: [
+      { url: `mux://assets/${sourceAssetId}`, start_time: startSeconds, end_time: endSeconds },
+    ],
+    playback_policies: ["public"],
+    passthrough: videoId,
+    video_quality: "basic",
+    static_renditions: [{ resolution: "highest" }],
+  });
+  return asset.id;
+}
+
 function isNotFound(error: unknown): boolean {
   return error instanceof Mux.APIError && error.status === 404;
 }

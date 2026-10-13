@@ -45,6 +45,7 @@ export type Database = {
           title: string;
           updated_at: string;
           view_count: number;
+          is_shared: boolean;
         };
         Insert: {
           aspect_ratio?: string | null;
@@ -60,6 +61,7 @@ export type Database = {
           title?: string;
           updated_at?: string;
           view_count?: number;
+          is_shared?: boolean;
         };
         Update: {
           aspect_ratio?: string | null;
@@ -75,6 +77,7 @@ export type Database = {
           title?: string;
           updated_at?: string;
           view_count?: number;
+          is_shared?: boolean;
         };
         Relationships: [
           {

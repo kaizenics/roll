@@ -38,6 +38,18 @@ test.describe("viewer page", () => {
     await expect(page.getByRole("main").getByRole("alert")).toContainText("couldn’t be processed");
   });
 
+  test("hides private videos from everyone but the owner", async ({ page }) => {
+    const response = await page.goto("/v/prvt234567");
+    expect(response?.status()).toBe(404);
+    expect((await page.goto("/embed/prvt234567"))?.status()).toBe(404);
+  });
+
+  test("serves a bare player for embeds of shared videos", async ({ page }) => {
+    const response = await page.goto("/embed/rdy2345678");
+    expect(response?.status()).toBe(200);
+    await expect(page.locator("mux-player")).toHaveCount(1);
+  });
+
   test("returns 404 for unknown links", async ({ page }) => {
     const response = await page.goto("/v/zzzzzzzzzz");
     expect(response?.status()).toBe(404);

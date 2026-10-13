@@ -43,6 +43,7 @@ function row(overrides: Partial<VideoRow> = {}): VideoRow {
     duration_seconds: 12,
     aspect_ratio: "16:9",
     view_count: 3,
+    is_shared: false,
     created_at: "2026-01-01T00:00:00Z",
     updated_at: "2026-01-01T00:00:00Z",
     ...overrides,
