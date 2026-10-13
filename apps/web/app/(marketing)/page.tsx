@@ -19,6 +19,7 @@ import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { HeroVisual } from "@/components/landing/hero-visual";
 import { RecordModes } from "@/components/landing/record-modes";
+import { EdgeBlur } from "@/components/edge-blur";
 import { LogoMark } from "@/components/logo";
 import { SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
@@ -245,26 +246,34 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* How it works */}
+        {/* How it works: pinned heading beside a step list (not three equal cards). */}
         <section aria-labelledby="how-it-works" className="border-t">
-          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-32">
-            <SectionHeading
-              id="how-it-works"
-              eyebrow="How it works"
-              title="From idea to link in under a minute."
-            />
-            <ol className="bg-border grid gap-px overflow-hidden rounded-2xl border md:grid-cols-3">
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 md:grid-cols-[1fr_1.35fr] md:gap-16 md:py-32">
+            <div className="md:sticky md:top-28 md:self-start">
+              <SectionHeading
+                id="how-it-works"
+                eyebrow="How it works"
+                title="From idea to link in under a minute."
+              />
+              <p className="text-muted-foreground -mt-6 max-w-[42ch]">
+                No scheduling, no screen-share call. Record once, and people watch when it suits
+                them.
+              </p>
+            </div>
+            <ol className="flex flex-col">
               {STEPS.map(({ verb, icon: Icon, body, meta }) => (
                 <li
                   key={verb}
-                  className="bg-background scroll-reveal flex flex-col gap-5 p-7 md:p-8"
+                  className="scroll-reveal grid grid-cols-[3rem_1fr] gap-x-5 border-b py-9 first:pt-0 last:border-b-0"
                 >
-                  <span className="bg-secondary flex size-11 items-center justify-center rounded-xl">
+                  <span className="bg-secondary flex size-12 items-center justify-center rounded-xl">
                     <Icon className="size-5" strokeWidth={1.75} aria-hidden />
                   </span>
-                  <h3 className="font-serif text-4xl">{verb}</h3>
-                  <p className="text-muted-foreground">{body}</p>
-                  <p className="mt-auto text-sm font-medium">{meta}</p>
+                  <div className="flex flex-col gap-3">
+                    <h3 className="font-serif text-4xl leading-none sm:text-5xl">{verb}</h3>
+                    <p className="text-muted-foreground max-w-[48ch] text-lg">{body}</p>
+                    <p className="text-sm font-medium">{meta}</p>
+                  </div>
                 </li>
               ))}
             </ol>
@@ -399,6 +408,7 @@ export default function LandingPage() {
           </nav>
         </div>
       </footer>
+      <EdgeBlur edge="bottom" className="fixed inset-x-0 bottom-0 z-30 h-16" />
     </>
   );
 }
