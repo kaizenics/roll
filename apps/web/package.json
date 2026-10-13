@@ -36,6 +36,7 @@
     "server-only": "^0.0.1",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.3.1",
+    "three": "^0.186.0",
     "zod": "^4.6.6"
   },
   "devDependencies": {
@@ -46,6 +47,7 @@
     "@types/node": "^22.18.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
+    "@types/three": "^0.186.0",
     "eslint": "^9.39.5",
     "tailwindcss": "^4.3.3",
     "tw-animate-css": "^1.3.8",
