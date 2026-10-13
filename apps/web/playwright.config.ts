@@ -12,6 +12,10 @@ const env = {
   NEXT_PUBLIC_SUPABASE_URL: `http://localhost:${MOCK_SUPABASE_PORT}`,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: "e2e-anon-key",
   SUPABASE_SERVICE_ROLE_KEY: "e2e-service-role-key",
+  // Blank (not unset) so values in .env.local can never reach the real Mux API.
+  MUX_TOKEN_ID: "",
+  MUX_TOKEN_SECRET: "",
+  MUX_WEBHOOK_SECRET: "",
   MOCK_SUPABASE_PORT: String(MOCK_SUPABASE_PORT),
 };
 
