@@ -9,12 +9,10 @@ import {
 } from "@roll/shared";
 import { Link2, Loader2, Pause, PictureInPicture2, Play, Square, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DeviceSelect, ToggleRow } from "@/components/recorder/fields";
-import { FloatingControls } from "@/components/recorder/floating-controls";
 import { createVideo, shareVideo } from "@/lib/api-client";
 import {
   canRecordScreen,
@@ -25,13 +23,31 @@ import {
   requestMic,
   type RecordingSession,
 } from "@/lib/recorder/media";
-import { useFloatingWindow } from "@/lib/recorder/floating-window";
+import {
+  bindPipControls,
+  createTimerVideo,
+  exitPip,
+  setPipPlaybackState,
+} from "@/lib/recorder/pip";
 import { uploadToMux } from "@/lib/recorder/upload";
 
 type Phase = "setup" | "countdown" | "recording" | "paused" | "uploading" | "uploaded" | "failed";
 
 function message(error: unknown): string {
   return error instanceof Error ? error.message : "Something went wrong";
+}
+
+/** Sends a pre-opened tab to the video page, or offers a link if the browser blocked it. */
+function openVideoPage(tab: Window | null, path: string) {
+  if (tab && !tab.closed) {
+    tab.location.href = path;
+    return;
+  }
+  // No click behind this stop (e.g. Chrome's "Stop sharing" bar), so no new tab.
+  toast.success("Your video page is ready", {
+    action: { label: "Open video", onClick: () => window.open(path, "_blank") },
+    duration: 15_000,
+  });
 }
 
 /** Records the screen in the browser (no extension) and uploads straight to Mux. */
@@ -50,9 +66,10 @@ export function WebRecorder() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
 
   const previewRef = useRef<HTMLVideoElement>(null);
-  const panel = useFloatingWindow();
-  const { close: closePanel } = panel;
-  const panelSize = { width: 300, height: camera ? 340 : 120 };
+  // Floating window content: the camera when it is on, otherwise a timer card.
+  const timerVideo = useRef<ReturnType<typeof createTimerVideo> | null>(null);
+  const [pipSupported, setPipSupported] = useState(false);
+  const pipVideo = () => (camera ? previewRef.current : (timerVideo.current?.video ?? null));
   const cameraStream = useRef<MediaStream | null>(null);
   const session = useRef<RecordingSession | null>(null);
   const blob = useRef<Blob | null>(null);
@@ -104,19 +121,27 @@ export function WebRecorder() {
     [],
   );
 
-  const upload = useCallback(async () => {
+  /** `tab` is a pre-opened tab to send to the video page once it exists. */
+  const upload = useCallback(async (tab: Window | null = null) => {
     const file = blob.current;
-    if (!file) return;
+    if (!file) {
+      tab?.close();
+      return;
+    }
     setPhase("uploading");
     setProgress(0);
     setError(null);
     try {
-      target.current ??= await createVideo();
+      if (!target.current) {
+        target.current = await createVideo();
+        openVideoPage(tab, `/v/${target.current.shortId}`);
+      }
       await uploadToMux(file, target.current.uploadUrl, setProgress);
       blob.current = null;
       setShareUrl(null);
       setPhase("uploaded");
     } catch (err) {
+      if (!target.current) tab?.close();
       setError(message(err));
       setPhase("failed");
     }
@@ -153,19 +178,25 @@ export function WebRecorder() {
   const stop = useCallback(async () => {
     const current = session.current;
     if (!current) return;
+    // Open the tab now, while the Stop click still counts as a user gesture;
+    // browsers block window.open after an await. It is pointed at the video later.
+    const tab = window.open("", "_blank");
+    if (tab) {
+      tab.document.title = "Roll";
+      tab.document.body.style.cssText = "margin:0;background:#161513;";
+    }
     session.current = null;
     clock.current = { accumulated: elapsed(), since: 0 };
-    closePanel();
-    if (document.pictureInPictureElement)
-      void document.exitPictureInPicture().catch(() => undefined);
+    exitPip();
     blob.current = await finishRecording(current);
     if (blob.current.size === 0) {
+      tab?.close();
       setError("The recording is empty. Please try again.");
       setPhase("setup");
       return;
     }
-    void upload();
-  }, [elapsed, upload, closePanel]);
+    void upload(tab);
+  }, [elapsed, upload]);
 
   const discard = useCallback(() => {
     const current = session.current;
@@ -173,11 +204,9 @@ export function WebRecorder() {
     current?.recorder.stop();
     current?.release();
     blob.current = null;
-    closePanel();
-    if (document.pictureInPictureElement)
-      void document.exitPictureInPicture().catch(() => undefined);
+    exitPip();
     setPhase("setup");
-  }, [closePanel]);
+  }, []);
 
   // Timer, 30-minute cap and the one-minute warning.
   useEffect(() => {
@@ -186,6 +215,7 @@ export function WebRecorder() {
     const timer = setInterval(() => {
       const ms = elapsed();
       setElapsedMs(ms);
+      timerVideo.current?.draw({ elapsedMs: ms, paused: false });
       if (!warned && ms >= RECORDING_WARNING_MS) {
         warned = true;
         toast.warning("One minute left. Recordings stop at 30:00.");
@@ -198,19 +228,18 @@ export function WebRecorder() {
   async function start() {
     setError(null);
     // Both need the click's user activation, so start them before awaiting anything.
-    // Floating controls window where supported; otherwise pop out just the camera.
-    const pip: Promise<unknown> = panel.supported
-      ? panel.open(panelSize)
-      : camera && previewRef.current && document.pictureInPictureEnabled
-        ? previewRef.current.requestPictureInPicture().catch(() => null)
+    timerVideo.current?.draw({ elapsedMs: 0, paused: false });
+    const video = pipVideo();
+    const pip: Promise<unknown> =
+      pipSupported && video
+        ? video.requestPictureInPicture().catch(() => null)
         : Promise.resolve(null);
     let display: MediaStream;
     try {
       display = await requestDisplay();
     } catch (err) {
       await pip;
-      closePanel();
-      if (document.pictureInPictureElement) void document.exitPictureInPicture();
+      exitPip();
       // NotAllowedError = the user closed the picker; that is not an error.
       if (!(err instanceof DOMException && err.name === "NotAllowedError")) setError(message(err));
       return;
@@ -247,20 +276,52 @@ export function WebRecorder() {
     setPhase("recording");
   }
 
-  function togglePause() {
+  const pause = useCallback(() => {
     const recorder = session.current?.recorder;
-    if (!recorder) return;
-    if (recorder.state === "recording") {
-      recorder.pause();
-      clock.current = { accumulated: elapsed(), since: 0 };
-      setElapsedMs(clock.current.accumulated);
-      setPhase("paused");
-    } else if (recorder.state === "paused") {
-      recorder.resume();
-      clock.current.since = performance.now();
-      setPhase("recording");
-    }
+    if (recorder?.state !== "recording") return;
+    recorder.pause();
+    clock.current = { accumulated: elapsed(), since: 0 };
+    setElapsedMs(clock.current.accumulated);
+    timerVideo.current?.draw({ elapsedMs: clock.current.accumulated, paused: true });
+    setPhase("paused");
+  }, [elapsed]);
+
+  const resume = useCallback(() => {
+    const recorder = session.current?.recorder;
+    if (recorder?.state !== "paused") return;
+    recorder.resume();
+    clock.current.since = performance.now();
+    setPhase("recording");
+  }, []);
+
+  function togglePause() {
+    if (session.current?.recorder.state === "paused") resume();
+    else pause();
   }
+
+  // Chrome's PiP buttons: play/pause pauses and resumes, the red hang-up button stops.
+  const live = phase === "recording" || phase === "paused";
+  useEffect(() => {
+    if (!live) return;
+    const video = camera ? previewRef.current : (timerVideo.current?.video ?? null);
+    if (!video) return;
+    return bindPipControls(video, { onPause: pause, onResume: resume, onStop: () => void stop() });
+  }, [live, camera, pause, resume, stop]);
+
+  useEffect(() => {
+    if (live) setPipPlaybackState(phase === "paused");
+  }, [live, phase]);
+
+  // The timer card exists for the whole page visit, so PiP can open instantly.
+  useEffect(() => {
+    if (!document.pictureInPictureEnabled) return;
+    setPipSupported(true);
+    timerVideo.current = createTimerVideo();
+    return () => {
+      timerVideo.current?.dispose();
+      timerVideo.current = null;
+    };
+  }, []);
 
   if (!supported) {
     return (
@@ -274,24 +335,9 @@ export function WebRecorder() {
   const microphones = devices.filter((d) => d.kind === "audioinput");
   const cameras = devices.filter((d) => d.kind === "videoinput");
   const busy = phase !== "setup" && phase !== "failed";
-  const live = phase === "countdown" || phase === "recording" || phase === "paused";
 
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_18rem] md:items-start">
-      {live &&
-        panel.floating &&
-        createPortal(
-          <FloatingControls
-            phase={phase}
-            countdown={countdown}
-            elapsedMs={elapsedMs}
-            camera={camera ? cameraStream.current : null}
-            onTogglePause={togglePause}
-            onStop={() => void stop()}
-            onDiscard={discard}
-          />,
-          panel.floating.document.body,
-        )}
       <div className="bg-card relative flex aspect-video items-center justify-center overflow-hidden rounded-xl border">
         <video
           ref={previewRef}
@@ -347,7 +393,7 @@ export function WebRecorder() {
             )}
             {phase === "failed" ? (
               <div className="grid gap-2">
-                <Button size="lg" onClick={() => void upload()}>
+                <Button size="lg" onClick={() => void upload(null)}>
                   Retry upload
                 </Button>
                 <Button variant="ghost" onClick={discard}>
@@ -438,8 +484,15 @@ export function WebRecorder() {
                 <Trash2 aria-hidden />
                 Discard
               </Button>
-              {panel.supported && !panel.floating && (
-                <Button variant="outline" onClick={() => void panel.open(panelSize)}>
+              {pipSupported && (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    void pipVideo()
+                      ?.requestPictureInPicture()
+                      .catch(() => undefined)
+                  }
+                >
                   <PictureInPicture2 aria-hidden />
                   Pop out controls
                 </Button>
