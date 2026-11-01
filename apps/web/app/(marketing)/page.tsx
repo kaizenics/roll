@@ -415,6 +415,12 @@ export default function LandingPage() {
             <Link href="/login" className="hover:text-foreground transition-colors">
               Sign in
             </Link>
+            <Link href="/privacy" className="hover:text-foreground transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="hover:text-foreground transition-colors">
+              Terms
+            </Link>
           </nav>
         </div>
       </footer>
