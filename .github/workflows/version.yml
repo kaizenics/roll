@@ -1,7 +1,3 @@
-# Auto-version on every push to main (beta: stays on 0.x.y).
-#   feat: ...            -> minor  (0.1.0 -> 0.2.0)
-#   anything else        -> patch  (0.1.0 -> 0.1.1)
-# Bumps apps/*/package.json, commits, tags vX.Y.Z and creates a GitHub prerelease.
 name: Version
 
 on:
@@ -53,7 +49,7 @@ jobs:
           git add apps/*/package.json
           git diff --cached --quiet || git commit -m "chore(release): v$NEXT [skip ci]"
           git tag "v$NEXT"
-          git push origin HEAD:main --follow-tags
+          git push origin HEAD:main "v$NEXT"
 
       - name: GitHub prerelease
         env:
