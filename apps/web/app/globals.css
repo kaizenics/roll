@@ -120,20 +120,9 @@
   }
 }
 
-/* Gentle entry for page content; skipped entirely for reduced motion. */
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    animation: reveal 600ms var(--ease-out-soft) both;
-    animation-delay: calc(var(--i, 0) * 80ms);
-  }
-  /* Content comes into focus: faded, lowered and blurred to sharp. */
-  @keyframes reveal {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-      filter: blur(10px);
-    }
-  }
+/* Lenis animates the scroll itself; native smooth scrolling would fight it. */
+html.lenis {
+  scroll-behavior: auto;
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -141,44 +130,56 @@
   }
 }
 
-/* Apple-style scroll focus, driven by CSS scroll timelines (no JS, so nothing
-   can get stuck hidden; unsupported browsers simply show everything).
-   - .scroll-reveal: blurs in entering from the bottom, sharp mid-screen, blurs
-     out leaving at the top.
-   - .blur-word: headings come into focus word by word as they scroll in. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .scroll-reveal {
-      animation:
-        focus-in linear both,
-        focus-out linear both;
-      animation-timeline: view(), view();
-      animation-range:
-        entry 0% cover 22%,
-        exit 25% exit 100%;
-    }
-    .blur-word {
-      display: inline-block;
-      animation: focus-in linear both;
-      animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 4%) cover calc(10% + var(--i, 0) * 2.5%);
-    }
-  }
+/* ── Landing page ─────────────────────────────────────────────────────────
+   Fixed black / white / red palette regardless of the app theme. Overriding
+   the tokens (not hard-coding colours) keeps Button, LogoMark and the 3D mark
+   on-palette. .landing-invert is the one deliberate flip to white. */
+.landing {
+  --background: #0b0b0b;
+  --foreground: #f4f4f2;
+  --card: #131313;
+  --card-foreground: #f4f4f2;
+  --primary: #f4f4f2;
+  --primary-foreground: #0b0b0b;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #f4f4f2;
+  --muted: #1a1a1a;
+  --muted-foreground: #9a9a96;
+  --accent: #1c1c1c;
+  --accent-foreground: #f4f4f2;
+  --border: #262626;
+  --input: #333333;
+  --ring: #f4f4f2;
+  /* White on this red is about 5:1, so it carries body-size text. */
+  --record: #e3181f;
+  background-color: var(--background);
+  color: var(--foreground);
 }
-
-@keyframes focus-in {
-  from {
-    opacity: 0;
-    filter: blur(14px);
-    transform: translateY(22px);
-  }
+.landing ::selection {
+  background: var(--record);
+  color: #fff;
 }
-@keyframes focus-out {
-  to {
-    opacity: 0;
-    filter: blur(14px);
-    transform: translateY(-22px);
-  }
+.landing-invert {
+  --background: #f4f4f2;
+  --foreground: #0b0b0b;
+  --muted-foreground: #5d5d59;
+  --border: #d6d6d2;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+/* Film grain on a fixed, non-scrolling layer (cheap to composite). */
+.landing-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Hollow display type; stroke follows the section's foreground. */
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--foreground);
 }
 
 /* ── iOS-style glass ───────────────────────────────────────────────────────

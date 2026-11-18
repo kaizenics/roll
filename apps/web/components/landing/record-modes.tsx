@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowUpRight, Check, Globe, Puzzle } from "lucide-react";
+import { ArrowUpRight, Globe, Puzzle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { EASE } from "./motion";
 
 const MODES = {
   browser: {
@@ -32,16 +33,19 @@ const MODES = {
 
 type Mode = keyof typeof MODES;
 
+const pill =
+  "inline-flex h-12 items-center gap-2 rounded-full px-6 font-medium outline-none transition-[background-color,color,transform] duration-300 focus-visible:ring-[3px] focus-visible:ring-white/40 active:scale-[0.98]";
+
 export function RecordModes({ chromeStoreUrl }: { chromeStoreUrl: string }) {
   const [mode, setMode] = useState<Mode>("browser");
   const active = MODES[mode];
 
   return (
-    <div className="bg-card rounded-2xl border p-2">
+    <div className="flex flex-col gap-10">
       <div
         role="tablist"
         aria-label="Ways to record"
-        className="bg-secondary grid grid-cols-2 gap-1 rounded-xl p-1"
+        className="inline-flex self-start rounded-full border p-1"
       >
         {(Object.keys(MODES) as Mode[]).map((key) => {
           const { label, icon: Icon } = MODES[key];
@@ -55,53 +59,68 @@ export function RecordModes({ chromeStoreUrl }: { chromeStoreUrl: string }) {
               aria-selected={selected}
               aria-controls="mode-panel"
               onClick={() => setMode(key)}
-              className={`focus-visible:ring-ring/30 flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium outline-none transition-[background-color,color,box-shadow] duration-200 focus-visible:ring-[3px] ${
-                selected
-                  ? "bg-card text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
-                  : "text-muted-foreground hover:text-foreground"
+              className={`relative flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium outline-none transition-colors duration-300 focus-visible:ring-[3px] focus-visible:ring-white/40 sm:px-5 ${
+                selected ? "text-white" : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <Icon className="size-4" aria-hidden />
-              {label}
+              {selected && (
+                <motion.span
+                  layoutId="mode-pill"
+                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  className="bg-record absolute inset-0 rounded-full"
+                />
+              )}
+              <Icon className="relative size-4" aria-hidden />
+              <span className="relative">{label}</span>
             </button>
           );
         })}
       </div>
 
-      <div
-        id="mode-panel"
-        role="tabpanel"
-        aria-labelledby={`mode-${mode}`}
-        key={mode}
-        className="animate-in fade-in-0 slide-in-from-bottom-1 flex flex-col gap-6 p-5 duration-300 sm:p-7"
-      >
-        <p className="text-lg">{active.summary}</p>
-        <ul className="flex flex-col gap-3">
-          {active.points.map((point) => (
-            <li key={point} className="flex gap-3">
-              <span className="bg-tint-green text-tint-green-foreground mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full">
-                <Check className="size-3" aria-hidden />
-              </span>
-              <span className="text-muted-foreground">{point}</span>
-            </li>
-          ))}
-        </ul>
-        {mode === "browser" ? (
-          <Button asChild className="self-start">
-            <Link href="/record">
-              <span aria-hidden className="bg-record size-2 rounded-full" />
-              Record in your browser
-            </Link>
-          </Button>
-        ) : (
-          <Button asChild variant="outline" className="self-start">
-            <a href={chromeStoreUrl} target="_blank" rel="noreferrer">
-              <Puzzle aria-hidden />
-              Add to Chrome or Edge
-              <ArrowUpRight aria-hidden />
-            </a>
-          </Button>
-        )}
+      <div id="mode-panel" role="tabpanel" aria-labelledby={`mode-${mode}`}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={mode}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.45, ease: EASE }}
+            className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-16"
+          >
+            <div className="flex flex-col items-start gap-8">
+              <p className="text-3xl font-medium leading-tight tracking-tight md:text-4xl">
+                {active.summary}
+              </p>
+              {mode === "browser" ? (
+                <Link href="/record" className={`${pill} bg-white text-black hover:bg-white/85`}>
+                  Record in your browser
+                  <ArrowUpRight className="size-4" aria-hidden />
+                </Link>
+              ) : (
+                <a
+                  href={chromeStoreUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${pill} border border-white/30 hover:bg-white hover:text-black`}
+                >
+                  <Puzzle className="size-4" aria-hidden />
+                  Add to Chrome or Edge
+                  <ArrowUpRight className="size-4" aria-hidden />
+                </a>
+              )}
+            </div>
+            <ul className="flex flex-col">
+              {active.points.map((point) => (
+                <li key={point} className="text-muted-foreground flex gap-4 border-t py-4 text-lg">
+                  <span aria-hidden className="text-record font-bold">
+                    +
+                  </span>
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

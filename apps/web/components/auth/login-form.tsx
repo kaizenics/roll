@@ -1,12 +1,9 @@
 "use client";
 
-import { Loader2, Mail } from "lucide-react";
+import { ArrowRight, Loader2, Mail } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const emailSchema = z.email("Enter a valid email address");
@@ -21,14 +18,16 @@ export function LoginForm({ next }: { next: string }) {
   const [email, setEmail] = useState("");
   const [pending, setPending] = useState<"email" | "google" | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
+  const [invalid, setInvalid] = useState<string | null>(null);
 
   async function sendMagicLink(event: FormEvent) {
     event.preventDefault();
     const parsed = emailSchema.safeParse(email.trim());
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Invalid email");
+      setInvalid(parsed.error.issues[0]?.message ?? "Invalid email");
       return;
     }
+    setInvalid(null);
     setPending("email");
     try {
       const { error } = await createSupabaseBrowserClient().auth.signInWithOtp({
@@ -60,60 +59,96 @@ export function LoginForm({ next }: { next: string }) {
 
   if (sentTo) {
     return (
-      <div role="status" className="flex flex-col items-center gap-2 py-4 text-center">
-        <Mail className="text-primary size-8" aria-hidden />
-        <p className="font-medium">Check your inbox</p>
-        <p className="text-muted-foreground text-sm">
-          We sent a sign-in link to <strong>{sentTo}</strong>.
+      <div role="status" className="flex flex-col items-start gap-5">
+        <span className="bg-record flex size-14 items-center justify-center rounded-full text-white">
+          <Mail className="size-6" aria-hidden />
+        </span>
+        <p className="text-3xl font-bold tracking-[-0.04em]">Check your inbox</p>
+        <p className="text-muted-foreground text-lg">
+          We sent a sign-in link to <strong className="text-foreground">{sentTo}</strong>.
         </p>
-        <Button variant="link" onClick={() => setSentTo(null)}>
+        <button
+          type="button"
+          onClick={() => setSentTo(null)}
+          className="hover:text-record text-sm font-medium uppercase tracking-[0.12em] underline-offset-4 outline-none hover:underline focus-visible:underline"
+        >
           Use a different email
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <Button
+    <div className="flex flex-col gap-8">
+      <button
         type="button"
-        variant="outline"
         onClick={signInWithGoogle}
         disabled={pending !== null}
+        className={`${PILL} border border-white/25 hover:bg-white hover:text-black`}
       >
-        {pending === "google" ? <Loader2 className="animate-spin" aria-hidden /> : <GoogleIcon />}
+        {pending === "google" ? (
+          <Loader2 className="size-5 animate-spin" aria-hidden />
+        ) : (
+          <GoogleIcon />
+        )}
         Continue with Google
-      </Button>
-      <div className="text-muted-foreground flex items-center gap-3 text-xs">
+      </button>
+      <div className="text-muted-foreground flex items-center gap-4 text-xs font-medium uppercase tracking-[0.2em]">
         <span className="bg-border h-px flex-1" />
         or
         <span className="bg-border h-px flex-1" />
       </div>
-      <form onSubmit={sendMagicLink} className="flex flex-col gap-3" noValidate>
+      <form onSubmit={sendMagicLink} className="flex flex-col gap-6" noValidate>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
+          <label htmlFor="email" className="text-muted-foreground text-sm font-medium">
+            Email
+          </label>
+          <input
             id="email"
             type="email"
             autoComplete="email"
             placeholder="you@company.com"
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              if (invalid) setInvalid(null);
+            }}
             required
+            aria-invalid={invalid ? true : undefined}
+            aria-describedby={invalid ? "email-error" : undefined}
+            className="focus:border-record aria-invalid:border-record w-full border-b-2 border-white/25 bg-transparent py-3 text-2xl font-medium tracking-[-0.02em] outline-none transition-colors duration-300 placeholder:text-[#6b6b67]"
           />
+          {invalid && (
+            <p id="email-error" className="text-record text-sm font-medium">
+              {invalid}
+            </p>
+          )}
         </div>
-        <Button type="submit" disabled={pending !== null}>
-          {pending === "email" && <Loader2 className="animate-spin" aria-hidden />}
+        <button
+          type="submit"
+          disabled={pending !== null}
+          className={`${PILL} bg-record group text-white hover:bg-white hover:text-black`}
+        >
+          {pending === "email" && <Loader2 className="size-5 animate-spin" aria-hidden />}
           Send magic link
-        </Button>
+          {pending !== "email" && (
+            <ArrowRight
+              className="ease-out-soft size-5 transition-transform duration-500 group-hover:translate-x-1"
+              aria-hidden
+            />
+          )}
+        </button>
       </form>
     </div>
   );
 }
 
+const PILL =
+  "inline-flex h-14 w-full items-center justify-center gap-3 rounded-full px-7 text-base font-medium outline-none transition-[background-color,color,transform] duration-300 focus-visible:ring-[3px] focus-visible:ring-white/40 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60";
+
 function GoogleIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className="size-4">
+    <svg viewBox="0 0 24 24" aria-hidden className="size-5">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"
