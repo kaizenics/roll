@@ -1,33 +1,37 @@
-import { Puzzle, Video } from "lucide-react";
+import { ArrowUpRight, Puzzle } from "lucide-react";
 import Link from "next/link";
+import { Reveal } from "@/components/landing/motion";
 import { Button } from "@/components/ui/button";
 import { getChromeStoreUrl } from "@/lib/env";
 
 export function EmptyState() {
   return (
-    <section className="flex flex-col items-center gap-4 rounded-xl border border-dashed px-6 py-16 text-center">
-      <span className="bg-accent text-accent-foreground flex size-12 items-center justify-center rounded-full">
-        <Video className="size-6" aria-hidden />
-      </span>
-      <h2 className="text-lg font-semibold">No recordings yet</h2>
-      <p className="text-muted-foreground max-w-md text-sm">
-        Record your screen right in the browser. Press stop and your share link is copied and shows
-        up here.
-      </p>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Button asChild>
-          <Link href="/record">
-            <span aria-hidden className="bg-record size-2.5 rounded-full" />
-            Start recording
-          </Link>
-        </Button>
-        <Button asChild variant="ghost">
-          <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">
-            <Puzzle aria-hidden />
-            Get the extension (optional)
-          </a>
-        </Button>
-      </div>
-    </section>
+    <Reveal>
+      <section className="flex flex-col items-start gap-8 py-10 md:py-16">
+        <h2 className="text-[clamp(2.5rem,6vw,5.5rem)] font-bold uppercase leading-[0.88] tracking-[-0.06em]">
+          Nothing rolling
+          <br />
+          <span className="text-outline">yet.</span>
+        </h2>
+        <p className="text-muted-foreground max-w-[46ch] text-lg">
+          Record your screen right in the browser. Press stop and your share link is copied and
+          shows up here.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Button asChild size="lg">
+            <Link href="/record">
+              Start recording
+              <ArrowUpRight aria-hidden />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">
+              <Puzzle aria-hidden />
+              Get the extension
+            </a>
+          </Button>
+        </div>
+      </section>
+    </Reveal>
   );
 }
