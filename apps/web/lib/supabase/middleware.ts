@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import type { Database } from "./database.types";
+import { timeoutFetch } from "./timeout-fetch";
 
 /**
  * Refreshes the Supabase session cookie on every request and returns the
@@ -16,6 +17,8 @@ export async function updateSession(
   if (!url || !anonKey) return { response, user: null };
 
   const supabase = createServerClient<Database>(url, anonKey, {
+    // Runs before every page: an unreachable Supabase must not stall the site.
+    global: { fetch: timeoutFetch(4000) },
     cookies: {
       getAll() {
         return request.cookies.getAll();
