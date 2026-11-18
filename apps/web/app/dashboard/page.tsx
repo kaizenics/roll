@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 import { VideoGrid } from "@/components/dashboard/video-grid";
+import { PageHeading } from "@/components/page-heading";
 import { SiteHeader } from "@/components/site-header";
+import { Button } from "@/components/ui/button";
 import { getAppUrl } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { syncPendingVideos } from "@/lib/mux-sync";
@@ -28,8 +32,19 @@ export default async function DashboardPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-6xl px-4 py-8">
-        <h1 className="mb-8 font-serif text-4xl tracking-[-0.01em]">Your videos</h1>
+      <main id="main" className="mx-auto max-w-[1600px] px-4 py-12 sm:px-8 md:py-16">
+        <PageHeading
+          title="Your videos"
+          description="Everything you record lands here, private until you share it."
+          actions={
+            <Button asChild size="lg">
+              <Link href="/record">
+                New recording
+                <ArrowUpRight aria-hidden />
+              </Link>
+            </Button>
+          }
+        />
         <VideoGrid initialVideos={videos} />
       </main>
     </>

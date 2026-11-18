@@ -65,7 +65,6 @@
 @theme inline {
   --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-serif: var(--font-instrument-serif), Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -182,21 +181,7 @@ html.lenis {
   -webkit-text-stroke: 1.5px var(--foreground);
 }
 
-/* ── iOS-style glass ───────────────────────────────────────────────────────
-   Header: frosted glass. With scroll timelines it starts clear at the top of
-   the page and frosts over the first 80px of scrolling. */
-.site-header {
-  background-color: color-mix(in oklab, var(--background) 72%, transparent);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--border);
-}
-
 @supports (animation-timeline: scroll()) {
-  .site-header {
-    animation: header-glass linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 80px;
-  }
   /* Animated on the blur layers, not the wrapper: an ancestor with animated
      opacity becomes a backdrop root and its children would blur nothing. */
   .edge-blur-top > div {
@@ -212,13 +197,6 @@ html.lenis {
   }
 }
 
-@keyframes header-glass {
-  from {
-    background-color: transparent;
-    backdrop-filter: saturate(100%) blur(0);
-    border-bottom-color: transparent;
-  }
-}
 @keyframes fade-in {
   from {
     opacity: 0;

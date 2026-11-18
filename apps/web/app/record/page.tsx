@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { PageHeading } from "@/components/page-heading";
 import { WebRecorder } from "@/components/recorder/web-recorder";
 import { SiteHeader } from "@/components/site-header";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -17,12 +18,11 @@ export default async function RecordPage() {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <h1 className="mb-2 font-serif text-4xl tracking-[-0.01em]">New recording</h1>
-        <p className="text-muted-foreground mb-8 max-w-[60ch]">
-          Record right here, no extension needed. Pick what to share, and the link is ready the
-          moment you stop.
-        </p>
+      <main id="main" className="mx-auto max-w-[1600px] px-4 py-12 sm:px-8 md:py-16">
+        <PageHeading
+          title="New recording"
+          description="Record right here, no extension needed. Pick what to share, and the link is ready the moment you stop."
+        />
         <WebRecorder />
       </main>
     </>

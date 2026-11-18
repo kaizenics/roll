@@ -17,7 +17,7 @@ export function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         sideOffset={sideOffset}
         className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-44 rounded-lg border p-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]",
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 z-50 min-w-48 border p-1 shadow-[0_16px_48px_rgba(0,0,0,0.5)]",
           className,
         )}
         {...props}
@@ -34,8 +34,8 @@ export function DropdownMenuItem({
   return (
     <DropdownMenuPrimitive.Item
       className={cn(
-        "focus:bg-accent flex cursor-default select-none items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4",
-        variant === "destructive" && "text-destructive focus:text-destructive",
+        "focus:bg-record flex cursor-default select-none items-center gap-2 px-3 py-2 text-sm outline-none focus:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:size-4",
+        variant === "destructive" && "text-record",
         className,
       )}
       {...props}

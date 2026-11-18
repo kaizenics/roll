@@ -6,7 +6,9 @@ import { Toaster } from "sonner";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    // One art direction (black / white / red) everywhere; "dark" keeps the dark
+    // status tints and dark: utilities in effect.
+    <ThemeProvider attribute="class" forcedTheme="dark" disableTransitionOnChange>
       {children}
       <Toaster richColors closeButton position="bottom-right" />
     </ThemeProvider>

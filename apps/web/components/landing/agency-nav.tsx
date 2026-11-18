@@ -4,8 +4,9 @@ import { ArrowUpRight } from "lucide-react";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "motion/react";
 import { useLenis } from "lenis/react";
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { LogoMark } from "@/components/logo";
+import { RollText } from "@/components/roll-text";
 import { EASE, INTRO_DELAY } from "./motion";
 
 const LINKS = [
@@ -13,23 +14,6 @@ const LINKS = [
   ["#features", "Features"],
   ["#questions", "Questions"],
 ] as const;
-
-/** Label that rolls up on hover, a red copy taking its place. */
-function RollText({ children }: { children: ReactNode }) {
-  return (
-    <span className="relative block overflow-hidden">
-      <span className="ease-out-soft block transition-transform duration-500 group-hover:-translate-y-full group-focus-visible:-translate-y-full">
-        {children}
-      </span>
-      <span
-        aria-hidden
-        className="text-record ease-out-soft absolute inset-0 block translate-y-full transition-transform duration-500 group-hover:translate-y-0 group-focus-visible:translate-y-0"
-      >
-        {children}
-      </span>
-    </span>
-  );
-}
 
 export function AgencyNav({
   signedIn,

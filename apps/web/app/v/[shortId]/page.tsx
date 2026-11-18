@@ -97,8 +97,8 @@ export default async function ViewerPage({ params }: Props) {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-6">
-        <div className="overflow-hidden rounded-xl bg-[#161513]">
+      <main id="main" className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-8 sm:px-8 md:py-12">
+        <div className="overflow-hidden border bg-black">
           {video.status === "ready" && video.playbackId ? (
             <VideoPlayer playbackId={video.playbackId} title={video.title} videoId={video.id} />
           ) : video.status === "errored" ? (
@@ -106,7 +106,7 @@ export default async function ViewerPage({ params }: Props) {
               role="alert"
               className="flex aspect-video flex-col items-center justify-center gap-3 p-6 text-center text-white"
             >
-              <AlertTriangle className="size-10 text-amber-400" aria-hidden />
+              <AlertTriangle className="text-record size-10" aria-hidden />
               <p className="text-lg font-medium">This video couldn’t be processed.</p>
               <p className="text-sm text-white/70">The recording may be corrupted or too short.</p>
             </div>
@@ -115,7 +115,7 @@ export default async function ViewerPage({ params }: Props) {
               role="status"
               className="flex aspect-video flex-col items-center justify-center gap-3 p-6 text-center text-white"
             >
-              <Loader2 className="size-10 animate-spin" aria-hidden />
+              <Loader2 className="text-record size-10 animate-spin" aria-hidden />
               <p className="text-lg font-medium">Processing…</p>
               <p className="text-sm text-white/70">
                 {video.status === "uploading"
@@ -128,9 +128,11 @@ export default async function ViewerPage({ params }: Props) {
           )}
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex min-w-0 flex-col gap-3">
-            <h1 className="break-words font-serif text-4xl tracking-[-0.01em]">{video.title}</h1>
+        <div className="flex flex-col gap-6 border-b pb-10 md:flex-row md:items-end md:justify-between">
+          <div className="flex min-w-0 flex-col gap-5">
+            <h1 className="break-words text-[clamp(2.25rem,5.5vw,4.75rem)] font-bold leading-[0.92] tracking-[-0.05em]">
+              {video.title}
+            </h1>
             <div className="flex items-center gap-3">
               <Avatar>
                 {video.owner.avatarUrl && <AvatarImage src={video.owner.avatarUrl} alt="" />}
@@ -138,7 +140,7 @@ export default async function ViewerPage({ params }: Props) {
               </Avatar>
               <div className="text-sm">
                 <p className="font-medium">{video.owner.name ?? "Roll user"}</p>
-                <p className="text-muted-foreground flex items-center gap-2">
+                <p className="text-muted-foreground flex items-center gap-2 font-mono text-xs uppercase tracking-[0.08em]">
                   <time dateTime={video.createdAt}>{formatDate(video.createdAt)}</time>
                   <span aria-hidden>·</span>
                   <span className="flex items-center gap-1">

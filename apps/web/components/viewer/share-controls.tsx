@@ -136,7 +136,7 @@ export function ShareControls({
                 value={code}
                 rows={4}
                 onFocus={(event) => event.currentTarget.select()}
-                className="border-input bg-muted w-full resize-none rounded-md border p-3 font-mono text-xs"
+                className="bg-muted w-full resize-none border p-3 font-mono text-xs"
               />
               <AlertDialogFooter>
                 <AlertDialogCancel>Close</AlertDialogCancel>

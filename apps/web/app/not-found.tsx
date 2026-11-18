@@ -1,17 +1,17 @@
+import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { NotFoundPoster } from "@/components/not-found-poster";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <main
-      id="main"
-      className="flex min-h-dvh flex-col items-center justify-center gap-4 px-4 text-center"
-    >
-      <p className="text-primary text-sm font-medium">404</p>
-      <h1 className="font-serif text-5xl tracking-[-0.02em]">Page not found</h1>
-      <Button asChild>
-        <Link href="/">Go home</Link>
+    <NotFoundPoster title="Page not found">
+      <Button asChild size="lg">
+        <Link href="/">
+          Go home
+          <ArrowUpRight aria-hidden />
+        </Link>
       </Button>
-    </main>
+    </NotFoundPoster>
   );
 }
