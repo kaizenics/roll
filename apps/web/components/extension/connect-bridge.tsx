@@ -72,16 +72,16 @@ export function ConnectBridge({ email }: { email: string | null }) {
   }, []);
 
   return (
-    <Card className="w-full max-w-sm text-center">
-      <CardHeader className="items-center">
+    <Card className="w-full max-w-md border-t-2 border-t-[#e3181f] text-center">
+      <CardHeader className="items-center gap-4 p-8">
         {state === "connecting" && (
-          <Loader2 className="text-primary size-10 animate-spin" aria-hidden />
+          <Loader2 className="text-record size-12 animate-spin" aria-hidden />
         )}
-        {state === "connected" && <CheckCircle2 className="size-10 text-emerald-500" aria-hidden />}
+        {state === "connected" && <CheckCircle2 className="size-12 text-white" aria-hidden />}
         {(state === "no-extension" || state === "error") && (
-          <PlugZap className="size-10 text-amber-500" aria-hidden />
+          <PlugZap className="text-record size-12" aria-hidden />
         )}
-        <CardTitle className="text-xl" role="status">
+        <CardTitle className="text-3xl font-bold tracking-[-0.04em]" role="status">
           {state === "connecting" && "Connecting extension…"}
           {state === "connected" && "Connected ✓"}
           {state === "no-extension" && "Extension not detected"}
@@ -96,7 +96,7 @@ export function ConnectBridge({ email }: { email: string | null }) {
           {state === "error" && "Please sign in again and retry from the extension."}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex justify-center gap-2">
+      <CardContent className="flex flex-wrap justify-center gap-3 p-8 pt-0">
         {state === "no-extension" && (
           <Button asChild>
             <a href={getChromeStoreUrl()} target="_blank" rel="noreferrer">

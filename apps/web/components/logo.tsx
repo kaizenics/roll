@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 /** Roll mark: a screen with the camera bubble on its corner. Inherits text colour. */
 export function LogoMark({ className = "size-7" }: { className?: string }) {
   return (
@@ -23,17 +21,5 @@ export function LogoMark({ className = "size-7" }: { className?: string }) {
         paintOrder="stroke"
       />
     </svg>
-  );
-}
-
-export function Logo() {
-  return (
-    <Link
-      href="/"
-      className="focus-visible:ring-ring/50 flex items-center gap-2 rounded-md text-lg font-semibold tracking-tight outline-none focus-visible:ring-[3px]"
-    >
-      <LogoMark />
-      Roll
-    </Link>
   );
 }

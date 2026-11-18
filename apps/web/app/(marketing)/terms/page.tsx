@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Logo } from "@/components/logo";
+import { LogoMark } from "@/components/logo";
 
 export const metadata: Metadata = { title: "Terms of Service" };
 
 export default function TermsPage() {
   return (
-    <main id="main" className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-      <Link href="/" aria-label="Roll home">
-        <Logo />
+    <main id="main" className="px-4 pb-24 pt-6 sm:px-8">
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 text-xl font-bold tracking-[-0.04em] outline-none focus-visible:underline"
+      >
+        <LogoMark className="size-8" />
+        Roll
       </Link>
-      <article className="text-muted-foreground mt-10 space-y-4 text-sm leading-relaxed [&_h2]:text-foreground [&_h2]:mt-8 [&_h2]:text-lg [&_h2]:font-medium">
-        <h1 className="text-foreground font-serif text-4xl">Terms of Service</h1>
+      <article className="text-muted-foreground [&_a]:text-foreground [&_h2]:text-foreground mx-auto mt-16 max-w-3xl space-y-5 text-lg leading-relaxed md:mt-24 [&_a:hover]:text-[#e3181f] [&_a]:underline-offset-4 [&_h2]:mt-14 [&_h2]:border-t [&_h2]:border-t-[#e3181f] [&_h2]:pt-6 [&_h2]:text-3xl [&_h2]:font-bold [&_h2]:tracking-[-0.03em] [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ul]:marker:text-[#e3181f]">
+        <h1 className="text-foreground text-[clamp(3rem,9vw,7.5rem)] font-bold uppercase leading-[0.86] tracking-[-0.065em]">
+          Terms of Service
+        </h1>
         <p>Last updated: November 1, 2026</p>
         <p>
           By using Roll (the website at roll.kaizenics.dev and the Roll browser extension) you agree

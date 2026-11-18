@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { EXTENSION_CONNECT_PATH } from "@roll/shared";
 import { ConnectBridge } from "@/components/extension/connect-bridge";
-import { Logo } from "@/components/logo";
+import { LogoMark } from "@/components/logo";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Connect extension", robots: { index: false } };
@@ -17,7 +17,10 @@ export default async function ExtensionConnectPage() {
 
   return (
     <main id="main" className="flex min-h-dvh flex-col items-center justify-center gap-8 px-4">
-      <Logo />
+      <span className="flex items-center gap-2.5 text-2xl font-bold tracking-[-0.04em]">
+        <LogoMark className="size-9" />
+        Roll
+      </span>
       <ConnectBridge email={user.email ?? null} />
     </main>
   );
