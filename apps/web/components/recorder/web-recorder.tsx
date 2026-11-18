@@ -183,7 +183,7 @@ export function WebRecorder() {
     const tab = window.open("", "_blank");
     if (tab) {
       tab.document.title = "Roll";
-      tab.document.body.style.cssText = "margin:0;background:#161513;";
+      tab.document.body.style.cssText = "margin:0;background:#0b0b0b;";
     }
     session.current = null;
     clock.current = { accumulated: elapsed(), since: 0 };
@@ -338,7 +338,7 @@ export function WebRecorder() {
 
   return (
     <div className="grid gap-8 md:grid-cols-[1fr_18rem] md:items-start">
-      <div className="bg-card relative flex aspect-video items-center justify-center overflow-hidden rounded-xl border">
+      <div className="bg-card relative flex aspect-video items-center justify-center overflow-hidden border">
         <video
           ref={previewRef}
           autoPlay
@@ -355,7 +355,7 @@ export function WebRecorder() {
           <div
             role="status"
             aria-live="assertive"
-            className="bg-background/80 absolute inset-0 flex items-center justify-center font-serif text-8xl"
+            className="bg-record absolute inset-0 flex items-center justify-center text-[clamp(6rem,18vw,14rem)] font-bold leading-none tracking-[-0.06em] text-white"
           >
             {countdown}
           </div>
@@ -386,7 +386,7 @@ export function WebRecorder() {
             {error && (
               <p
                 role="alert"
-                className="bg-tint-red text-tint-red-foreground rounded-md p-3 text-sm"
+                className="border-record border-l-2 bg-[#e3181f]/10 px-4 py-3 text-sm"
               >
                 {error}
               </p>
