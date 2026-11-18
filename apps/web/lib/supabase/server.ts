@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getPublicSupabaseEnv } from "@/lib/env";
 import type { Database } from "./database.types";
+import { timeoutFetch } from "./timeout-fetch";
 
 /** Cookie-bound client for Server Components, Route Handlers and Server Actions. */
 export async function createSupabaseServerClient() {
@@ -10,6 +11,7 @@ export async function createSupabaseServerClient() {
   const { url, anonKey } = getPublicSupabaseEnv();
 
   return createServerClient<Database>(url, anonKey, {
+    global: { fetch: timeoutFetch(8000) },
     cookies: {
       getAll() {
         return cookieStore.getAll();
