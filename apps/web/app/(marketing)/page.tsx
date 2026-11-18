@@ -1,29 +1,24 @@
-import {
-  ArrowUpRight,
-  Code2,
-  Eye,
-  Film,
-  Lock,
-  MonitorPlay,
-  PictureInPicture2,
-  Puzzle,
-  Scissors,
-  ShieldCheck,
-  Square,
-  Unlink,
-  Video,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowUpRight, Eye, Lock, Puzzle, ShieldCheck, Unlink } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
-import { BlurText } from "@/components/landing/blur-text";
-import { HeroVisual } from "@/components/landing/hero-visual";
+import { Faq } from "@/components/landing/faq";
+import { FeatureList } from "@/components/landing/feature-list";
+import { AgencyNav } from "@/components/landing/agency-nav";
+import {
+  Curtain,
+  Enter,
+  INTRO_DELAY,
+  Magnetic,
+  MaskLines,
+  Parallax,
+  Reveal,
+  ScrollWords,
+} from "@/components/landing/motion";
+import { Process } from "@/components/landing/process";
 import { RecordModes } from "@/components/landing/record-modes";
-import { EdgeBlur } from "@/components/edge-blur";
-import { LogoMark } from "@/components/logo";
-import { SiteHeader } from "@/components/site-header";
-import { Button } from "@/components/ui/button";
+import { ScreenZoom } from "@/components/landing/screen-zoom";
+import { SmoothScroll } from "@/components/landing/smooth-scroll";
+import { currentUserId } from "@/components/site-header";
 import { getChromeStoreUrl } from "@/lib/env";
 
 export const metadata: Metadata = {
@@ -31,97 +26,6 @@ export const metadata: Metadata = {
   description:
     "Record your screen, camera and voice from the browser. Trim it, then share a private-by-default link or embed it anywhere.",
 };
-
-const stagger = (i: number) => ({ "--i": i }) as CSSProperties;
-
-const STEPS = [
-  {
-    verb: "Record",
-    icon: MonitorPlay,
-    body: "Pick your screen, a window or a tab. Add your microphone and a camera bubble.",
-    meta: "3-2-1 countdown, then you're live",
-  },
-  {
-    verb: "Stop",
-    icon: Square,
-    body: "Hit stop from the floating controls. The video uploads while you get back to work.",
-    meta: "Ready to watch in seconds",
-  },
-  {
-    verb: "Share",
-    icon: ArrowUpRight,
-    body: "Generate a link when you're ready, or embed it in your docs. Revoke it any time.",
-    meta: "Viewers don't need an account",
-  },
-];
-
-interface Feature {
-  icon: LucideIcon;
-  title: string;
-  body: string;
-  className: string;
-  detail?: ReactNode;
-}
-
-const Chip = ({ children }: { children: ReactNode }) => (
-  <span className="bg-secondary text-secondary-foreground rounded-md px-2 py-1 font-mono text-xs">
-    {children}
-  </span>
-);
-
-const FEATURES: Feature[] = [
-  {
-    icon: Video,
-    title: "Your face, wherever you record",
-    body: "A round camera bubble you can drag, resize or hide. In the browser it floats above every app, so it lands in the recording exactly where you put it.",
-    className: "md:col-span-4",
-    detail: (
-      <div className="flex gap-2">
-        <Chip>S</Chip>
-        <Chip>M</Chip>
-        <Chip>L</Chip>
-        <Chip>Hide</Chip>
-      </div>
-    ),
-  },
-  {
-    icon: Lock,
-    title: "Private until you share",
-    body: "Only you can watch a new recording. Generate a link when it's ready.",
-    className: "md:col-span-2",
-  },
-  {
-    icon: Scissors,
-    title: "Trim on a timeline",
-    body: "Drag the handles on a filmstrip, scrub with the playhead, or use I and O. The original stays safe until the cut is ready.",
-    className: "md:col-span-3",
-  },
-  {
-    icon: Code2,
-    title: "Embed anywhere",
-    body: "Copy an iframe for your docs, wiki or site. Revoking the link turns embeds off too.",
-    className: "md:col-span-3",
-  },
-  {
-    icon: PictureInPicture2,
-    title: "Controls that follow you",
-    body: "Pause, stop or discard from a small floating window while you work in other apps.",
-    className: "md:col-span-2",
-  },
-  {
-    icon: Film,
-    title: "Streams like it should",
-    body: "Adaptive streaming that adjusts to slow connections, an MP4 download, and rich previews when you paste the link into Slack or Discord.",
-    className: "md:col-span-4",
-    detail: (
-      <div className="flex flex-wrap gap-2">
-        <Chip>Adaptive streaming</Chip>
-        <Chip>MP4 download</Chip>
-        <Chip>Link previews</Chip>
-      </div>
-    ),
-  },
-];
 
 const PRIVACY = [
   {
@@ -146,285 +50,269 @@ const PRIVACY = [
   },
 ];
 
-const QUESTIONS = [
-  {
-    q: "Do I need to install anything?",
-    a: "No. Roll records right in Chrome, Edge or Firefox on desktop. The extension is optional and adds one-click tab recording.",
-  },
-  {
-    q: "Do viewers need an account?",
-    a: "No. Anyone with a shared link can watch, on any device. They can't rename, delete or download your video.",
-  },
-  {
-    q: "How long can a recording be?",
-    a: "Up to 30 minutes. Roll gives you a heads-up at 29:00 and stops on its own at the limit.",
-  },
-  {
-    q: "What happens if the upload fails?",
-    a: "You can retry right away. The extension also keeps the recording on disk until the upload goes through.",
-  },
-  {
-    q: "Can I edit a recording?",
-    a: "You can trim the start and end on a timeline. Roll keeps the original playable until the trimmed version is ready.",
-  },
-  {
-    q: "Can I download my video?",
-    a: "Yes. Once processing finishes, download it as an MP4 from the video page.",
-  },
-];
+const pill =
+  "inline-flex h-14 items-center gap-2 rounded-full px-7 text-base font-medium outline-none transition-[background-color,color,transform] duration-300 focus-visible:ring-[3px] focus-visible:ring-white/40 active:scale-[0.98]";
 
-function SectionHeading({ id, eyebrow, title }: { id: string; eyebrow: string; title: string }) {
-  return (
-    <div className="mb-12 max-w-2xl">
-      <p className="text-muted-foreground scroll-reveal mb-3 text-sm">{eyebrow}</p>
-      <h2 id={id} className="font-serif text-4xl leading-[1.08] tracking-[-0.015em] sm:text-5xl">
-        <BlurText text={title} />
-      </h2>
-    </div>
-  );
-}
+const display = "font-bold uppercase tracking-[-0.065em]";
 
-export default function LandingPage() {
+export default async function LandingPage() {
   const chromeStoreUrl = getChromeStoreUrl();
+  const signedIn = Boolean(await currentUserId());
 
   return (
-    <>
-      <SiteHeader>
-        <div className="mr-2 hidden items-center gap-1 md:flex">
-          {[
-            ["#how-it-works", "How it works"],
-            ["#features", "Features"],
-            ["#questions", "Questions"],
-          ].map(([href, label]) => (
-            <Button key={href} asChild variant="ghost" size="sm" className="text-muted-foreground">
-              <a href={href}>{label}</a>
-            </Button>
-          ))}
-        </div>
-      </SiteHeader>
+    <SmoothScroll>
+      <div className="landing min-h-dvh">
+        <Curtain />
+        <div aria-hidden className="landing-grain" />
 
-      <main id="main" className="overflow-x-clip">
-        {/* Hero: one giant word with the 3D mark over it; the mark turns as you scroll. */}
-        <section className="relative flex min-h-[calc(100dvh-3.5rem)] flex-col px-4 pb-20 pt-6 sm:px-6 md:pb-24">
-          <div className="relative flex flex-1 items-center justify-center py-10">
-            <h1 className="reveal select-none text-center" style={stagger(1)}>
-              <span className="sr-only">Roll: say it with a video, share it with a link.</span>
-              <span
-                aria-hidden
-                className="block text-[clamp(4.5rem,21vw,23rem)] font-semibold uppercase leading-[0.82] tracking-[-0.06em]"
+        <AgencyNav signedIn={signedIn} chromeStoreUrl={chromeStoreUrl} />
+
+        <main id="main" className="overflow-x-clip">
+          {/* Hero: two staggered lines of display type; the nav floats over it. */}
+          <section className="relative flex min-h-dvh flex-col px-4 pb-12 pt-28 sm:px-8 md:pb-16 md:pt-32">
+            <div className="relative flex flex-1 items-end pb-4 md:items-center md:pb-0">
+              <h1
+                className={`relative z-10 w-full text-[17vw] leading-[0.82] md:text-[clamp(3.25rem,14vw,15.5rem)] ${display}`}
               >
-                <span className="text-record">Cap</span>ture
-              </span>
-            </h1>
-            {/* Overlaps the word; never blocks clicks or text selection below it. */}
-            <div
-              className="reveal pointer-events-none absolute -inset-y-6 inset-x-0 mx-auto max-w-5xl"
-              style={stagger(2)}
-            >
-              <HeroVisual />
+                <span className="sr-only">Record it. Send it.</span>
+                <MaskLines
+                  delay={INTRO_DELAY}
+                  lines={[
+                    "Record it.",
+                    <span key="send" className="block text-right">
+                      <span className="text-outline">Send</span> it
+                      <span className="text-record">.</span>
+                    </span>,
+                  ]}
+                />
+              </h1>
             </div>
-          </div>
 
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="reveal max-w-md" style={stagger(3)}>
-              <p className="text-lg leading-snug">
-                Say it with a video. Record your screen, camera and voice from the browser.
-              </p>
-              <p className="text-record/90 text-lg italic leading-snug">Share it with a link.</p>
-            </div>
-            <div
-              className="reveal flex flex-col gap-2 sm:flex-row sm:items-center"
-              style={stagger(4)}
-            >
-              <Button asChild size="lg">
-                <Link href="/record">
-                  <span aria-hidden className="bg-record size-2.5 rounded-full" />
-                  Start recording
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="ghost">
-                <a href={chromeStoreUrl} target="_blank" rel="noreferrer">
-                  <Puzzle aria-hidden />
+            <div className="relative z-20 mt-10 grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+              <Enter delay={INTRO_DELAY + 0.45}>
+                <p className="max-w-[34ch] text-lg leading-snug md:text-xl">
+                  Record your screen, camera and voice from the browser. Share a link people watch
+                  when it suits them.
+                </p>
+              </Enter>
+              <Enter delay={INTRO_DELAY + 0.55} className="flex flex-wrap items-center gap-3">
+                <Magnetic strength={0.25}>
+                  <Link
+                    href="/record"
+                    className={`${pill} bg-record text-white hover:bg-white hover:text-black`}
+                  >
+                    Start recording
+                    <ArrowUpRight className="size-5" aria-hidden />
+                  </Link>
+                </Magnetic>
+                <a
+                  href={chromeStoreUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`${pill} border border-white/25 hover:bg-white hover:text-black`}
+                >
+                  <Puzzle className="size-5" aria-hidden />
                   Add to Chrome or Edge
-                  <ArrowUpRight aria-hidden />
                 </a>
-              </Button>
+              </Enter>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* How it works: pinned heading beside a step list (not three equal cards). */}
-        <section aria-labelledby="how-it-works" className="border-t">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 md:grid-cols-[1fr_1.35fr] md:gap-16 md:py-32">
-            <div className="md:sticky md:top-28 md:self-start">
-              <SectionHeading
-                id="how-it-works"
-                eyebrow="How it works"
-                title="From idea to link in under a minute."
-              />
-              <p className="text-muted-foreground scroll-reveal -mt-6 max-w-[42ch]">
-                No scheduling, no screen-share call. Record once, and people watch when it suits
-                them.
-              </p>
-            </div>
-            <ol className="flex flex-col">
-              {STEPS.map(({ verb, icon: Icon, body, meta }) => (
-                <li
-                  key={verb}
-                  className="scroll-reveal grid grid-cols-[3rem_1fr] gap-x-5 border-b py-9 first:pt-0 last:border-b-0"
-                >
-                  <span className="bg-secondary flex size-12 items-center justify-center rounded-xl">
-                    <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <div className="flex flex-col gap-3">
-                    <h3 className="font-serif text-4xl leading-none sm:text-5xl">{verb}</h3>
-                    <p className="text-muted-foreground max-w-[48ch] text-lg">{body}</p>
-                    <p className="text-sm font-medium">{meta}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
+          <ScreenZoom />
 
-        {/* Features */}
-        <section aria-labelledby="features" className="bg-secondary/50 border-t">
-          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-32">
-            <SectionHeading
-              id="features"
-              eyebrow="Features"
-              title="Everything a quick video needs. Nothing it doesn't."
+          {/* The one flip to white: the pitch, lit word by word as you read. */}
+          <section aria-label="Why Roll" className="landing-invert px-4 py-32 sm:px-8 md:py-48">
+            <ScrollWords
+              className="mx-auto max-w-6xl text-[clamp(2.1rem,5.2vw,5rem)] font-semibold leading-[1.02] tracking-[-0.045em]"
+              text="Most updates don't need a meeting. Record your screen, camera and voice once, then send a link people can watch whenever it suits them."
             />
-            <div className="grid gap-4 md:grid-cols-6">
-              {FEATURES.map(({ icon: Icon, title, body, className, detail }) => (
-                <article
-                  key={title}
-                  className={`bg-card scroll-reveal flex flex-col gap-4 rounded-2xl border p-7 transition-shadow duration-300 hover:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.12)] ${className}`}
-                >
-                  <Icon className="size-6" strokeWidth={1.5} aria-hidden />
-                  <h3 className="text-xl font-medium">{title}</h3>
-                  <p className="text-muted-foreground max-w-[56ch]">{body}</p>
-                  {detail && <div className="mt-auto pt-2">{detail}</div>}
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Two ways to record */}
-        <section aria-labelledby="modes" className="border-t">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 md:grid-cols-[1fr_1.15fr] md:items-center md:py-32">
-            <div>
-              <SectionHeading
-                id="modes"
-                eyebrow="Two ways to record"
-                title="Start in the browser. Add the extension if you like."
-              />
-              <p className="text-muted-foreground scroll-reveal -mt-6 max-w-[48ch]">
-                Both save to the same library, with the same links, editor and privacy. Pick
-                whichever fits how you work.
-              </p>
-            </div>
-            <div className="scroll-reveal">
-              <RecordModes chromeStoreUrl={chromeStoreUrl} />
-            </div>
-          </div>
-        </section>
+          <Process />
 
-        {/* Privacy */}
-        <section aria-labelledby="privacy" className="border-t">
-          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 md:grid-cols-[1fr_1.4fr] md:py-32">
-            <div>
-              <p className="text-muted-foreground scroll-reveal mb-3 text-sm">Privacy</p>
-              <h2
-                id="privacy"
-                className="font-serif text-4xl leading-[1.08] tracking-[-0.015em] sm:text-5xl"
-              >
-                <BlurText text="Your recordings stay yours." />
-              </h2>
-            </div>
-            <ul className="grid gap-x-10 gap-y-9 sm:grid-cols-2">
-              {PRIVACY.map(({ icon: Icon, title, body }) => (
-                <li key={title} className="scroll-reveal flex flex-col gap-2">
-                  <span className="bg-secondary mb-1 flex size-10 items-center justify-center rounded-xl">
-                    <Icon className="size-5" strokeWidth={1.75} aria-hidden />
-                  </span>
-                  <h3 className="font-medium">{title}</h3>
-                  <p className="text-muted-foreground">{body}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Questions */}
-        <section aria-labelledby="questions" className="border-t">
-          <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-32">
-            <SectionHeading id="questions" eyebrow="Questions" title="Good to know." />
-            <dl className="grid gap-x-12 gap-y-10 md:grid-cols-2">
-              {QUESTIONS.map(({ q, a }) => (
-                <div key={q} className="scroll-reveal border-t pt-6">
-                  <dt className="text-lg font-medium">{q}</dt>
-                  <dd className="text-muted-foreground mt-2">{a}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        </section>
-
-        {/* Final call to action */}
-        <section className="border-t">
-          <div className="mx-auto flex max-w-6xl flex-col items-start gap-8 px-4 py-24 sm:px-6 md:flex-row md:items-end md:justify-between md:py-32">
-            <h2 className="max-w-xl font-serif text-5xl leading-[1.04] tracking-[-0.02em] sm:text-6xl">
-              <BlurText text="Skip the meeting." />{" "}
-              <span className="text-muted-foreground italic">
-                <BlurText text="Send a Roll." offset={3} />
-              </span>
-            </h2>
-            <Button asChild size="lg" className="scroll-reveal">
-              <Link href="/record">
-                <span aria-hidden className="bg-record size-2.5 rounded-full" />
-                Record your first video
-              </Link>
-            </Button>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t">
-        <div className="text-muted-foreground mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <span className="text-foreground flex items-center gap-2 font-medium">
-            <LogoMark className="size-5" />
-            Roll
-          </span>
-          <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/record" className="hover:text-foreground transition-colors">
-              Record
-            </Link>
-            <Link href="/dashboard" className="hover:text-foreground transition-colors">
-              Dashboard
-            </Link>
-            <a
-              href={chromeStoreUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-foreground transition-colors"
+          <section aria-labelledby="features" className="border-t py-24 md:py-36">
+            <h2
+              id="features"
+              className={`mb-16 px-4 text-[clamp(2.6rem,7vw,7rem)] leading-[0.88] sm:px-8 md:mb-24 ${display}`}
             >
-              Extension
-            </a>
-            <Link href="/login" className="hover:text-foreground transition-colors">
-              Sign in
-            </Link>
-            <Link href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors">
-              Terms
-            </Link>
-          </nav>
-        </div>
-      </footer>
-      <EdgeBlur edge="bottom" className="fixed inset-x-0 bottom-0 z-30 h-16" />
-    </>
+              <span className="sr-only">
+                Everything a quick video needs. Nothing it doesn&apos;t.
+              </span>
+              <MaskLines
+                inView
+                lines={[
+                  "Everything a",
+                  "quick video needs.",
+                  <span key="n" className="text-record">
+                    Nothing it doesn&apos;t.
+                  </span>,
+                ]}
+              />
+            </h2>
+            <FeatureList />
+          </section>
+
+          <section aria-labelledby="modes" className="bg-card border-t">
+            <div className="px-4 py-24 sm:px-8 md:py-36">
+              <h2
+                id="modes"
+                className={`text-[clamp(2.4rem,5.5vw,5.5rem)] leading-[0.9] ${display}`}
+              >
+                <span className="sr-only">
+                  Start in the browser. Add the extension if you like.
+                </span>
+                <MaskLines
+                  inView
+                  lines={[
+                    "Start in the browser.",
+                    <span key="e" className="text-outline">
+                      Extension optional.
+                    </span>,
+                  ]}
+                />
+              </h2>
+              <Reveal className="mb-16 mt-8 max-w-[52ch] md:mb-20">
+                <p className="text-muted-foreground text-lg">
+                  Both save to the same library, with the same links, editor and privacy. Pick
+                  whichever fits how you work.
+                </p>
+              </Reveal>
+              <Reveal>
+                <RecordModes chromeStoreUrl={chromeStoreUrl} />
+              </Reveal>
+            </div>
+          </section>
+
+          <section aria-labelledby="privacy" className="border-t">
+            <div className="grid md:grid-cols-[1fr_1.2fr]">
+              <div className="flex flex-col justify-between gap-16 border-b px-4 py-20 sm:px-8 md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:self-start md:border-b-0 md:border-r md:py-16">
+                <h2
+                  id="privacy"
+                  className={`text-[clamp(2.6rem,6vw,6rem)] leading-[0.88] ${display}`}
+                >
+                  <span className="sr-only">Your recordings stay yours.</span>
+                  <MaskLines
+                    inView
+                    lines={[
+                      "Your",
+                      "recordings",
+                      <span key="y" className="text-record">
+                        stay yours.
+                      </span>,
+                    ]}
+                  />
+                </h2>
+                <Lock aria-hidden className="text-record size-24 md:size-32" strokeWidth={1} />
+              </div>
+              <ul>
+                {PRIVACY.map(({ icon: Icon, title, body }, i) => (
+                  <li key={title} className="border-b last:border-b-0">
+                    <Reveal
+                      delay={i * 0.05}
+                      className="hover:bg-card flex min-h-[50dvh] flex-col justify-end gap-4 px-4 py-14 transition-colors duration-500 sm:px-8 md:px-12"
+                    >
+                      <Icon aria-hidden className="text-record mb-auto size-8" strokeWidth={1.5} />
+                      <h3 className="text-[clamp(1.9rem,3.6vw,3.25rem)] font-bold leading-none tracking-[-0.04em]">
+                        {title}
+                      </h3>
+                      <p className="text-muted-foreground max-w-[46ch] text-lg">{body}</p>
+                    </Reveal>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          <section aria-labelledby="questions" className="border-t px-4 py-24 sm:px-8 md:py-36">
+            <div className="mx-auto max-w-4xl">
+              <h2
+                id="questions"
+                className={`mb-14 text-[clamp(2.6rem,7vw,6.5rem)] leading-[0.88] ${display}`}
+              >
+                <span className="sr-only">Good to know.</span>
+                <MaskLines inView lines={["Good to know."]} />
+              </h2>
+              <Faq />
+            </div>
+          </section>
+
+          {/* Closing call to action: the round button is pulled toward the cursor. */}
+          <section className="relative border-t px-4 py-28 sm:px-8 md:py-40">
+            <h2 className={`text-[clamp(3.25rem,12vw,13rem)] leading-[0.82] ${display}`}>
+              <span className="sr-only">Skip the meeting. Send a Roll.</span>
+              <MaskLines
+                inView
+                lines={[
+                  "Skip the",
+                  <span key="m" className="text-outline">
+                    meeting.
+                  </span>,
+                  <span key="s" className="text-record">
+                    Send a Roll.
+                  </span>,
+                ]}
+              />
+            </h2>
+            <div className="mt-14 md:absolute md:right-[7vw] md:top-[38%] md:mt-0">
+              <Magnetic strength={0.4}>
+                <Link
+                  href="/record"
+                  className="bg-record flex size-44 flex-col items-center justify-center gap-2 rounded-full text-center text-lg font-medium leading-tight text-white outline-none transition-[background-color,color,transform] duration-500 hover:scale-105 hover:bg-white hover:text-black focus-visible:ring-[3px] focus-visible:ring-white/50 md:size-60 md:text-xl"
+                >
+                  <ArrowUpRight className="size-7" aria-hidden />
+                  Record your
+                  <br />
+                  first video
+                </Link>
+              </Magnetic>
+            </div>
+          </section>
+        </main>
+
+        <footer className="overflow-hidden border-t">
+          <div className="text-muted-foreground flex flex-col gap-8 px-4 py-10 text-sm sm:px-8 md:flex-row md:items-start md:justify-between">
+            <p className="text-foreground max-w-xs text-base">
+              Async video messages. Record your screen, camera and voice, then share a link.
+            </p>
+            <nav aria-label="Footer" className="grid grid-cols-2 gap-x-12 gap-y-2 sm:grid-cols-3">
+              {(
+                [
+                  ["/record", "Record"],
+                  ["/dashboard", "Dashboard"],
+                  [chromeStoreUrl, "Extension"],
+                  ["/login", "Sign in"],
+                  ["/privacy", "Privacy"],
+                  ["/terms", "Terms"],
+                ] as const
+              ).map(([href, label]) =>
+                href.startsWith("/") ? (
+                  <Link key={label} href={href} className="hover:text-record transition-colors">
+                    {label}
+                  </Link>
+                ) : (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-record transition-colors"
+                  >
+                    {label}
+                  </a>
+                ),
+              )}
+            </nav>
+          </div>
+          <Parallax distance={140}>
+            <p
+              aria-hidden
+              className="select-none whitespace-nowrap px-2 pb-[2vw] text-[50vw] font-bold leading-[0.74] tracking-[-0.08em]"
+            >
+              Roll<span className="text-record">.</span>
+            </p>
+          </Parallax>
+        </footer>
+      </div>
+    </SmoothScroll>
   );
 }
